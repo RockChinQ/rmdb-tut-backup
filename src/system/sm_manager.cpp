@@ -188,7 +188,21 @@ void SmManager::create_table(const std::string& tab_name, const std::vector<ColD
  * @param {Context*} context
  */
 void SmManager::drop_table(const std::string& tab_name, Context* context) {
-    
+    // 检查
+    if (!db_.is_table(tab_name)) {
+        throw TableNotFoundError(tab_name);
+    }
+
+    // 删除元数据
+
+    db_.tabs_.erase(tab_name);
+
+    // 删除数据文件
+    rm_manager_->destroy_file(tab_name);
+
+    // 刷新元数据
+
+    flush_meta();
 }
 
 /**
