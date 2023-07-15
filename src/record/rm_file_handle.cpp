@@ -33,7 +33,8 @@ std::unique_ptr<RmRecord> RmFileHandle::get_record(const Rid& rid, Context* cont
     memcpy(data, page_handle.get_slot(rid.slot_no), size);
 
     // 3. 返回指向RmRecord的指针
-    return std::make_unique<RmRecord>(data, size);
+
+    return std::make_unique<RmRecord>(size, data);
 }
 
 /**
