@@ -34,6 +34,8 @@ std::unique_ptr<RmRecord> RmFileHandle::get_record(const Rid& rid, Context* cont
 
     // 3. 返回指向RmRecord的指针
 
+    buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), false);
+
     return std::make_unique<RmRecord>(size, data);
 }
 
@@ -60,9 +62,6 @@ Rid RmFileHandle::insert_record(char* buf, Context* context) {
     memcpy(spare_page_handle.get_slot(slot_no), buf, file_hdr_.record_size);
     Bitmap::set(spare_page_handle.bitmap, slot_no);
 
-    // 置脏
-    buffer_pool_manager_->mark_dirty(spare_page_handle.page);
-
     // 4. 更新page_handle.page_hdr中的数据结构
 
     spare_page_handle.page_hdr->num_records++;
@@ -72,6 +71,8 @@ Rid RmFileHandle::insert_record(char* buf, Context* context) {
     }
 
     // 注意考虑插入一条记录后页面已满的情况，需要更新file_hdr_.first_free_page_no
+
+    buffer_pool_manager_->unpin_page(spare_page_handle.page->get_page_id(), true);
 
     return Rid{spare_page_handle.page->get_page_id().page_no, slot_no};
 }
@@ -94,9 +95,6 @@ void RmFileHandle::insert_record(const Rid& rid, char* buf) {
 
     Bitmap::set(page_handle.bitmap, rid.slot_no);
 
-    // 置脏
-    buffer_pool_manager_->mark_dirty(page_handle.page);
-
     // 这里是不是应该更新page_handle.page_hdr中的数据结构？
     // 应该取决于memcpy前后是否有新增记录？
     if (!is_set_) {
@@ -106,6 +104,7 @@ void RmFileHandle::insert_record(const Rid& rid, char* buf) {
         }
     }
 
+    buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), true);
 }
 
 /**
@@ -125,15 +124,14 @@ void RmFileHandle::delete_record(const Rid& rid, Context* context) {
 
     Bitmap::reset(page_handle.bitmap, rid.slot_no);
 
-    // 置脏
-    buffer_pool_manager_->mark_dirty(page_handle.page);
-
     page_handle.page_hdr->num_records--;
     if (page_handle.page_hdr->num_records == file_hdr_.num_records_per_page - 1) {
         release_page_handle(page_handle);
     }
 
     // 注意考虑删除一条记录后页面未满的情况，需要调用release_page_handle()
+
+    buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), true);
 }
 
 
@@ -154,10 +152,8 @@ void RmFileHandle::update_record(const Rid& rid, char* buf, Context* context) {
     // 2. 更新记录
 
     memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
-
-    // 置脏
-    buffer_pool_manager_->mark_dirty(page_handle.page);
     
+    buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), true);
 }
 
 /**
