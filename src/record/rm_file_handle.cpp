@@ -18,10 +18,22 @@ See the Mulan PSL v2 for more details. */
  */
 std::unique_ptr<RmRecord> RmFileHandle::get_record(const Rid& rid, Context* context) const {
     // Todo:
+    
     // 1. 获取指定记录所在的page handle
+
+    RmPageHandle page_handle = fetch_page_handle(rid.page_no);
+
     // 2. 初始化一个指向RmRecord的指针（赋值其内部的data和size）
 
-    return nullptr;
+    int size = file_hdr_.record_size;
+    
+    // 将page_handle的slots中的slot_no对应的数据复制到record中
+    char* data = new char[size];
+
+    memcpy(data, page_handle.get_slot(rid.slot_no), size);
+
+    // 3. 返回指向RmRecord的指针
+    return std::make_unique<RmRecord>(data, size);
 }
 
 /**
@@ -33,12 +45,31 @@ std::unique_ptr<RmRecord> RmFileHandle::get_record(const Rid& rid, Context* cont
 Rid RmFileHandle::insert_record(char* buf, Context* context) {
     // Todo:
     // 1. 获取当前未满的page handle
+    
+    RmPageHandle spare_page_handle = create_page_handle();
+    
     // 2. 在page handle中找到空闲slot位置
+    // 一定是未满的
+    // 找0！
+
+    int slot_no = Bitmap::first_bit(false, spare_page_handle.bitmap, file_hdr_.num_records_per_page);
+
     // 3. 将buf复制到空闲slot位置
+
+    memcpy(spare_page_handle.get_slot(slot_no), buf, file_hdr_.record_size);
+    Bitmap::set(spare_page_handle.bitmap, slot_no);
+
     // 4. 更新page_handle.page_hdr中的数据结构
+
+    spare_page_handle.page_hdr->num_records++;
+
+    if (spare_page_handle.page_hdr->num_records == file_hdr_.num_records_per_page) {
+        file_hdr_.first_free_page_no = spare_page_handle.page_hdr->next_free_page_no;
+    }
+
     // 注意考虑插入一条记录后页面已满的情况，需要更新file_hdr_.first_free_page_no
 
-    return Rid{-1, -1};
+    return Rid{spare_page_handle.page->get_page_id().page_no, slot_no};
 }
 
 /**
@@ -47,7 +78,27 @@ Rid RmFileHandle::insert_record(char* buf, Context* context) {
  * @param {char*} buf 要插入记录的数据
  */
 void RmFileHandle::insert_record(const Rid& rid, char* buf) {
-    
+    // 应该不用判断是否为空？
+
+    // TODO: 异常检查
+
+    RmPageHandle page_handle = fetch_page_handle(rid.page_no);
+
+    memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
+
+    bool is_set_ = Bitmap::is_set(page_handle.bitmap, rid.slot_no);
+
+    Bitmap::set(page_handle.bitmap, rid.slot_no);
+
+    // 这里是不是应该更新page_handle.page_hdr中的数据结构？
+    // 应该取决于memcpy前后是否有新增记录？
+    if (!is_set_) {
+        page_handle.page_hdr->num_records++;
+        if (page_handle.page_hdr->num_records == file_hdr_.num_records_per_page) {
+            file_hdr_.first_free_page_no = page_handle.page_hdr->next_free_page_no;
+        }
+    }
+
 }
 
 /**
@@ -58,7 +109,20 @@ void RmFileHandle::insert_record(const Rid& rid, char* buf) {
 void RmFileHandle::delete_record(const Rid& rid, Context* context) {
     // Todo:
     // 1. 获取指定记录所在的page handle
+
+    // TODO: 异常检查
+
+    RmPageHandle page_handle = fetch_page_handle(rid.page_no);
+
     // 2. 更新page_handle.page_hdr中的数据结构
+
+    Bitmap::reset(page_handle.bitmap, rid.slot_no);
+
+    page_handle.page_hdr->num_records--;
+    if (page_handle.page_hdr->num_records == file_hdr_.num_records_per_page - 1) {
+        release_page_handle(page_handle);
+    }
+
     // 注意考虑删除一条记录后页面未满的情况，需要调用release_page_handle()
 }
 
@@ -72,8 +136,15 @@ void RmFileHandle::delete_record(const Rid& rid, Context* context) {
 void RmFileHandle::update_record(const Rid& rid, char* buf, Context* context) {
     // Todo:
     // 1. 获取指定记录所在的page handle
+    
+    // TODO: 异常检查
+
+    RmPageHandle page_handle = fetch_page_handle(rid.page_no);
+
     // 2. 更新记录
 
+    memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
+    
 }
 
 /**
