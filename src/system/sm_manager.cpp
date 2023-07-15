@@ -85,7 +85,19 @@ void SmManager::drop_db(const std::string& db_name) {
  * @param {string&} db_name 数据库名称，与文件夹同名
  */
 void SmManager::open_db(const std::string& db_name) {
-    
+    // 检查是否存在db_name/目录
+    if (!is_dir(db_name)) {
+        throw DatabaseNotFoundError(db_name);
+    }
+    // 进入db_name/目录
+    if (chdir(db_name.c_str()) < 0) {
+        throw UnixError();
+    }
+
+    // 读取数据库元数据
+    db_.name_ = db_name;
+
+    // TODO: 加载表元数据
 }
 
 /**
@@ -110,6 +122,7 @@ void SmManager::close_db() {
  */
 void SmManager::show_tables(Context* context) {
     std::fstream outfile;
+    
     outfile.open("output.txt", std::ios::out | std::ios::app);
     outfile << "| Tables |\n";
     RecordPrinter printer(1);
