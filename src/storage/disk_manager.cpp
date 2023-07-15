@@ -14,6 +14,8 @@ See the Mulan PSL v2 for more details. */
 #include <string.h>    // for memset
 #include <sys/stat.h>  // for stat
 #include <unistd.h>    // for lseek
+#include <iostream>    // for cout
+#include <fstream>     // for ofstream
 
 #include "defs.h"
 
@@ -31,7 +33,15 @@ void DiskManager::write_page(int fd, page_id_t page_no, const char *offset, int 
     // 1.lseek()定位到文件头，通过(fd,page_no)可以定位指定页面及其在磁盘文件中的偏移量
     // 2.调用write()函数
     // 注意write返回值与num_bytes不等时 throw InternalError("DiskManager::write_page Error");
+    int offset_byte = page_no * PAGE_SIZE;
 
+    if (lseek(fd, offset_byte, SEEK_SET) != offset_byte) {
+        throw InternalError("Failed to seek page " + std::to_string(page_no) + " in file " + std::to_string(fd));
+    }
+
+    if (write(fd, offset, num_bytes) != num_bytes) {
+        throw InternalError("Failed to write page " + std::to_string(page_no) + " in file " + std::to_string(fd));
+    }
 }
 
 /**
@@ -46,7 +56,15 @@ void DiskManager::read_page(int fd, page_id_t page_no, char *offset, int num_byt
     // 1.lseek()定位到文件头，通过(fd,page_no)可以定位指定页面及其在磁盘文件中的偏移量
     // 2.调用read()函数
     // 注意read返回值与num_bytes不等时，throw InternalError("DiskManager::read_page Error");
+    int offset_byte = page_no * PAGE_SIZE;
 
+    if (lseek(fd, offset_byte, SEEK_SET) != offset_byte) {
+        throw InternalError("Failed to seek page " + std::to_string(page_no) + " in file " + std::to_string(fd));
+    }
+
+    if (read(fd, offset, num_bytes) != num_bytes) {
+        throw InternalError("Failed to read page " + std::to_string(page_no) + " in file " + std::to_string(fd));
+    }
 }
 
 /**
@@ -102,6 +120,14 @@ void DiskManager::create_file(const std::string &path) {
     // Todo:
     // 调用open()函数，使用O_CREAT模式
     // 注意不能重复创建相同文件
+    int fd = open(path.c_str(), O_CREAT, 0666);
+    if (fd < 0) {
+        throw std::runtime_error("Failed to create file: " + path);
+    }
+
+    // 到底该不该存到文件打开列表中？
+    // 应该在下面open_file()函数中存入文件打开列表中？
+    close(fd);
 }
 
 /**
@@ -112,7 +138,15 @@ void DiskManager::destroy_file(const std::string &path) {
     // Todo:
     // 调用unlink()函数
     // 注意不能删除未关闭的文件
-    
+    if (path2fd_.count(path) > 0){
+        throw std::runtime_error("Cannot destroy an opened file: " + path);
+    }
+
+    int symbol = unlink(path.c_str());
+
+    if (symbol < 0) {
+        throw std::runtime_error("Failed to destroy file: " + path);
+    }
 }
 
 
@@ -126,6 +160,22 @@ int DiskManager::open_file(const std::string &path) {
     // 调用open()函数，使用O_RDWR模式
     // 注意不能重复打开相同文件，并且需要更新文件打开列表
 
+    // 检查文件是否已经打开
+    if (path2fd_.count(path) > 0) {
+        throw std::runtime_error("Cannot open an opened file: " + path);
+    }
+
+    // 打开文件
+    int fd = open(path.c_str(), O_RDWR);
+
+    if (fd < 0) {
+        throw std::runtime_error("Failed to open file: " + path);
+    }
+
+    path2fd_[path] = fd;
+    fd2path_[fd] = path;
+
+    return fd;
 }
 
 /**
@@ -136,7 +186,16 @@ void DiskManager::close_file(int fd) {
     // Todo:
     // 调用close()函数
     // 注意不能关闭未打开的文件，并且需要更新文件打开列表
+    if (fd2path_.count(fd) == 0) {
+        throw std::runtime_error("Cannot close an unopened file: " + fd);
+    }
 
+    close(fd);
+
+    std::string path = fd2path_[fd];
+
+    path2fd_.erase(path);
+    fd2path_.erase(fd);
 }
 
 
