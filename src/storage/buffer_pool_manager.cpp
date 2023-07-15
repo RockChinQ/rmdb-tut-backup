@@ -61,7 +61,7 @@ void BufferPoolManager::update_page(Page *page, PageId new_page_id, frame_id_t n
 
     if (page->is_dirty_) {
         disk_manager_->write_page(page->id_.fd, page->id_.page_no, page->get_data(), PAGE_SIZE);
-        page->is_dirty_ = false;
+        //page->is_dirty_ = false;
     }
 
     // 2 更新page table
@@ -75,7 +75,7 @@ void BufferPoolManager::update_page(Page *page, PageId new_page_id, frame_id_t n
     page->id_ = new_page_id;
 
     page->pin_count_ = 0;
-    // page->is_dirty_ = false;
+    page->is_dirty_ = false;
 }
 
 /**
@@ -184,7 +184,9 @@ bool BufferPoolManager::unpin_page(PageId page_id, bool is_dirty) {
                 replacer_->unpin(it->second);
             }
             // 3 根据参数is_dirty，更改P的is_dirty_
-            pages_[it->second].is_dirty_ = is_dirty;
+            if (is_dirty) {
+                pages_[it->second].is_dirty_ = true;
+            }
         }
         return true;
     }
@@ -200,6 +202,8 @@ bool BufferPoolManager::flush_page(PageId page_id) {
     // 0. lock latch
 
     std::scoped_lock lock{latch_};
+
+    assert(page_id.page_no != INVALID_PAGE_ID);
 
     // 1. 查找页表,尝试获取目标页P
 
@@ -298,6 +302,8 @@ bool BufferPoolManager::delete_page(PageId page_id) {
 
     free_list_.push_back(it->second);
     
+    pages_[it->second].pin_count_ = 0;
+
     return true;
 }
 
