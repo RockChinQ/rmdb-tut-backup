@@ -247,7 +247,6 @@ Page* BufferPoolManager::new_page(PageId* page_id) {
     // 3.   将frame的数据写回磁盘
 
     disk_manager_->write_page(page_id->fd, page_id->page_no, page->get_data(), PAGE_SIZE);
-
     // 4.   固定frame，更新pin_count_
 
     page->pin_count_ += 1;
@@ -285,6 +284,7 @@ bool BufferPoolManager::delete_page(PageId page_id) {
     // 3.   将目标页数据写回磁盘，从页表中删除目标页，重置其元数据，将其加入free_list_，返回true
     if (pages_[it->second].is_dirty_) {
         disk_manager_->write_page(page_id.fd, page_id.page_no, pages_[it->second].get_data(), PAGE_SIZE);
+        pages_[it->second].is_dirty_ = false;
     }
 
     page_table_.erase(it);
