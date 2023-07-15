@@ -139,7 +139,8 @@ void DiskManager::destroy_file(const std::string &path) {
     // 调用unlink()函数
     // 注意不能删除未关闭的文件
     if (path2fd_.count(path) > 0){
-        throw std::runtime_error("Cannot destroy an opened file: " + path);
+        // 关闭文件
+        close_file(path2fd_[path]);
     }
 
     int symbol = unlink(path.c_str());
