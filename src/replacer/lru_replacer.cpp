@@ -70,6 +70,11 @@ void LRUReplacer::unpin(frame_id_t frame_id) {
     // 添加到LRUlist_最后
     std::scoped_lock lock{latch_};
 
+    // 检查是否已经存在
+    if (LRUhash_.count(frame_id) != 0) {
+        return;
+    }
+
     LRUlist_.push_back(frame_id);
     LRUhash_[frame_id] = --LRUlist_.end();
 }
