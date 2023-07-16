@@ -120,6 +120,11 @@ void DiskManager::create_file(const std::string &path) {
     // Todo:
     // 调用open()函数，使用O_CREAT模式
     // 注意不能重复创建相同文件
+
+    if(is_file(path)) {
+        throw FileExistsError(path);
+    }
+
     int fd = open(path.c_str(), O_CREAT, 0666);
     if (fd < 0) {
         throw std::runtime_error("Failed to create file: " + path);
@@ -127,7 +132,10 @@ void DiskManager::create_file(const std::string &path) {
 
     // 到底该不该存到文件打开列表中？
     // 应该在下面open_file()函数中存入文件打开列表中？
-    close(fd);
+
+    if (close(fd)==-1) {
+        throw FileNotClosedError(path);
+    };
 }
 
 /**
@@ -138,9 +146,19 @@ void DiskManager::destroy_file(const std::string &path) {
     // Todo:
     // 调用unlink()函数
     // 注意不能删除未关闭的文件
-    if (path2fd_.count(path) > 0){
-        // 关闭文件
-        close_file(path2fd_[path]);
+
+    //判断文件是否存在
+    if(!is_file(path)) {
+        throw FileNotFoundError(path);
+    }
+
+    // if (path2fd_.count(path) > 0){
+    //     // 关闭文件
+    //     close_file(path2fd_[path]);
+    // }
+
+    if(path2fd_.count(path)) {
+        throw FileNotClosedError(path);
     }
 
     int symbol = unlink(path.c_str());
@@ -160,6 +178,10 @@ int DiskManager::open_file(const std::string &path) {
     // Todo:
     // 调用open()函数，使用O_RDWR模式
     // 注意不能重复打开相同文件，并且需要更新文件打开列表
+
+    if(!is_file(path)) {
+        throw FileNotFoundError(path);
+    }
 
     // 检查文件是否已经打开
     if (path2fd_.count(path) > 0) {
