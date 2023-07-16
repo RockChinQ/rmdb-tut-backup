@@ -126,6 +126,10 @@ void RmFileHandle::delete_record(const Rid& rid, Context* context) {
 
     // 2. 更新page_handle.page_hdr中的数据结构
 
+    if(!Bitmap::is_set(page_handle.bitmap,rid.slot_no)){
+        throw RecordNotFoundError(rid.page_no,rid.slot_no);
+    }
+
     Bitmap::reset(page_handle.bitmap, rid.slot_no);
 
     page_handle.page_hdr->num_records--;
@@ -153,6 +157,10 @@ void RmFileHandle::update_record(const Rid& rid, char* buf, Context* context) {
 
     RmPageHandle page_handle = fetch_page_handle(rid.page_no);
 
+    if(!Bitmap::is_set(page_handle.bitmap, rid.slot_no)){
+        throw RecordNotFoundError(rid.page_no,rid.slot_no);
+    }
+
     // 2. 更新记录
 
     memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
@@ -173,12 +181,20 @@ RmPageHandle RmFileHandle::fetch_page_handle(int page_no) const {
     // 使用缓冲池获取指定页面，并生成page_handle返回给上层
     // if page_no is invalid, throw PageNotExistError exception
 
+    if(page_no >= RmFileHandle::file_hdr_.num_pages) {
+        throw PageNotExistError("",page_no);
+    }
+
     PageId pagd_id;
 
     pagd_id.fd = fd_;
     pagd_id.page_no = page_no;
 
     Page* page = buffer_pool_manager_->fetch_page(pagd_id);
+
+    if(page == nullptr) {
+        throw PageNotExistError("",page_no);
+    }
 
     return RmPageHandle(&file_hdr_, page);
 }
