@@ -98,24 +98,44 @@ void RmFileHandle::insert_record(const Rid& rid, char* buf) {
 
     // TODO: 异常检查
 
-    RmPageHandle page_handle = fetch_page_handle(rid.page_no);
+    // RmPageHandle page_handle = fetch_page_handle(rid.page_no);
 
-    std::memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
+    // std::memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
 
-    bool is_set_ = Bitmap::is_set(page_handle.bitmap, rid.slot_no);
+    // bool is_set_ = Bitmap::is_set(page_handle.bitmap, rid.slot_no);
 
-    Bitmap::set(page_handle.bitmap, rid.slot_no);
+    // Bitmap::set(page_handle.bitmap, rid.slot_no);
 
-    // 这里是不是应该更新page_handle.page_hdr中的数据结构？
-    // 应该取决于memcpy前后是否有新增记录？
-    if (!is_set_) {
-        page_handle.page_hdr->num_records++;
-        if (page_handle.page_hdr->num_records == file_hdr_.num_records_per_page) {
-            file_hdr_.first_free_page_no = page_handle.page_hdr->next_free_page_no;
-        }
+    // // 这里是不是应该更新page_handle.page_hdr中的数据结构？
+    // // 应该取决于memcpy前后是否有新增记录？
+    // if (!is_set_) {
+    //     page_handle.page_hdr->num_records++;
+    //     if (page_handle.page_hdr->num_records == file_hdr_.num_records_per_page) {
+    //         file_hdr_.first_free_page_no = page_handle.page_hdr->next_free_page_no;
+    //     }
+    // }
+
+    // buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), true);
+
+    RmPageHandle page_hdl = fetch_page_handle(rid.page_no);
+    assert(Bitmap::is_set(page_hdl.bitmap, rid.slot_no));   
+
+    // 3. 在指定位置插入记录
+    int record_size = file_hdr_.record_size;
+    char* slot_ptr = page_hdl.get_slot(rid.slot_no);
+    std::memcpy(slot_ptr, buf, record_size);
+
+    // 4. 更新page_handle中的数据结构
+    Bitmap::set(page_hdl.bitmap, rid.slot_no);
+    int record_nums = file_hdr_.num_records_per_page;
+    if(++page_hdl.page_hdr->num_records == record_nums){
+        // 感觉不太对劲？为什么它作为第一个空闲的？
+        // TODO 修改
+        file_hdr_.first_free_page_no = page_hdl.page_hdr->next_free_page_no;
     }
 
-    buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), true);
+    buffer_pool_manager_->unpin_page(page_hdl.page->get_page_id(), true);
+
 }
 
 /**
