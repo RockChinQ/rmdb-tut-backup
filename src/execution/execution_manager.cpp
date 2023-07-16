@@ -198,5 +198,6 @@ void QlManager::select_from(std::unique_ptr<AbstractExecutor> executorTreeRoot, 
 
 // 执行DML语句
 void QlManager::run_dml(std::unique_ptr<AbstractExecutor> exec){
+
     exec->Next();
 }

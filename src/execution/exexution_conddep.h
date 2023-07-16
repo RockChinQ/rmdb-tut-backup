@@ -39,6 +39,7 @@ class ConditionDependedExecutor {
 
     bool check_conds(const std::vector<Condition> &conds, const RmRecord &record) {
         for (auto &cond : conds) {
+            std::cout<<"check_conds: "<<cond.lhs_col.col_name<<std::endl;
             if (!check_cond(cond, record)) {
                 return false;
             }

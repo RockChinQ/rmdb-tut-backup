@@ -33,7 +33,6 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
 
    public:
     SeqScanExecutor(SmManager *sm_manager, std::string tab_name, std::vector<Condition> conds, Context *context) {
-        std::cout<<"SeqScanExecutor"<<std::endl;
 
         sm_manager_ = sm_manager;
         tab_name_ = std::move(tab_name);
@@ -47,9 +46,6 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
 
         fed_conds_ = conds_;
 
-        std::cout<<(ConditionDependedExecutor::sm_manager_==nullptr)<<std::endl;
-
-        std::cout<<"SeqScanExecutor end"<<std::endl;
     }
 
     size_t tupleLen() const override { return len_; }
@@ -60,14 +56,10 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
 
     void beginTuple() override {
         // 为scan_赋值
-        std::cout<<"beginTuple"<<std::endl;
         RmScan *scan = new RmScan(fh_);
         scan_ = std::unique_ptr<RecScan>(scan);
-        std::cout<<"beginTuple end"<<std::endl;
         scan_->begin();
         auto rec = scan_.get()->rid();
-        std::cout<<"beginTuple rid "<<rec.page_no<<", "<<rec.slot_no<<std::endl;
-
         nextTuple();
     }
 
@@ -76,7 +68,6 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
         // 再next下一条
         // 返回的是此条！！！！！！！！！！！！！！！！！
         scan_->next();
-        std::cout<<"nextTuple"<<std::endl;
         while (!scan_->is_end()) {
             auto rec = scan_.get()->rid();
             auto record = fh_->get_record(rec, context_);
@@ -91,8 +82,6 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
                 }
             }
 
-            std::cout<<"rec "<<rec.page_no<<", "<<rec.slot_no<<std::endl;
-
             if (flag) {
                 rid_ = rec;
                 return;
@@ -103,13 +92,11 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
 
     bool is_end() const override {
     
-        std::cout<<"executor_seq_scan is_end "<<(scan_->is_end())<<std::endl;
         return scan_->is_end(); 
         
     }
 
     std::unique_ptr<RmRecord> Next() override {
-        std::cout<<"executor_seq_scan Next"<<std::endl;
         // nextTuple();
         // if (scan_->is_end()) {
         //     std::cout<<"executor_seq_scan Next is_end"<<std::endl;
@@ -118,11 +105,7 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
 
         auto rec = rid();
 
-        std::cout<<"executor_seq_scan Next rid"<<rec.page_no<<", "<<rec.slot_no<<std::endl;
-
         auto record = fh_->get_record(rec, context_);
-
-        std::cout<<"executor_seq_scan Next end"<<std::endl;
 
         return record;
     }
