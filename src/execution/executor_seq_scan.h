@@ -46,16 +46,51 @@ class SeqScanExecutor : public AbstractExecutor {
     }
 
     void beginTuple() override {
-        
+        // 为scan_赋值
+        RmScan *scan = new RmScan(fh_);
+        scan_ = std::unique_ptr<RecScan>(scan);
     }
 
     void nextTuple() override {
-        
+        // 先检查此条记录是否满足所有条件
+        // 再next下一条
+        // 返回的是此条！！！！！！！！！！！！！！！！！
+        while (!scan_->is_end()) {
+            auto rec = scan_.get()->rid();
+            auto record = fh_->get_record(rec, context_);
+
+            // 检查所有条件
+            bool flag = true;
+
+            for (auto &cond : conds_) {
+                if (!check_cond(cond, *record)) {
+                    flag = false;
+                    break;
+                }
+            }
+
+            scan_->next();
+
+            if (flag) {
+                rid_ = rec;
+                return;
+            }
+        }
     }
 
     std::unique_ptr<RmRecord> Next() override {
-        return nullptr;
+        nextTuple();
+        if (scan_->is_end()) {
+            return nullptr;
+        }
+
+        auto rec = rid();
+
+        auto record = fh_->get_record(rec, context_);
+
+        return record;
     }
 
     Rid &rid() override { return rid_; }
+
 };
