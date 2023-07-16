@@ -28,19 +28,22 @@ std::unique_ptr<RmRecord> RmFileHandle::get_record(const Rid& rid, Context* cont
     int size = file_hdr_.record_size;
     
     // 将page_handle的slots中的slot_no对应的数据复制到record中
-    char* data = new char[size];
+   //char* data = new char[size];
 
-    std::cout<<"get_record memcpy"<<std::endl;
-    memcpy(data, page_handle.get_slot(rid.slot_no), size);
-    std::cout<<"get_record memcpy end"<<std::endl;
+    auto rm_rcd = std::make_unique<RmRecord>(size);
 
+    //std::cout<<"get_record memcpy"<<std::endl;
+    std::memcpy(rm_rcd->data, page_handle.get_slot(rid.slot_no), size);
+    //std::cout<<"get_record memcpy end"<<std::endl;
+    rm_rcd->size = size;
     // 3. 返回指向RmRecord的指针
 
     buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), false);
 
-    std::cout<<"page unpinned"<<std::endl;
+    //std::cout<<"page unpinned"<<std::endl;
 
-    return std::make_unique<RmRecord>(size, data);
+    //return std::make_unique<RmRecord>(size, data);
+    return rm_rcd;
 }
 
 /**
@@ -61,9 +64,13 @@ Rid RmFileHandle::insert_record(char* buf, Context* context) {
 
     int slot_no = Bitmap::first_bit(false, spare_page_handle.bitmap, file_hdr_.num_records_per_page);
 
+    if(slot_no == file_hdr_.num_records_per_page){ 
+        throw InvalidSlotNoError(slot_no, file_hdr_.num_records_per_page);
+    }
+
     // 3. 将buf复制到空闲slot位置
 
-    memcpy(spare_page_handle.get_slot(slot_no), buf, file_hdr_.record_size);
+    std::memcpy(spare_page_handle.get_slot(slot_no), buf, file_hdr_.record_size);
     Bitmap::set(spare_page_handle.bitmap, slot_no);
 
     // 4. 更新page_handle.page_hdr中的数据结构
@@ -93,7 +100,7 @@ void RmFileHandle::insert_record(const Rid& rid, char* buf) {
 
     RmPageHandle page_handle = fetch_page_handle(rid.page_no);
 
-    memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
+    std::memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
 
     bool is_set_ = Bitmap::is_set(page_handle.bitmap, rid.slot_no);
 
@@ -109,6 +116,7 @@ void RmFileHandle::insert_record(const Rid& rid, char* buf) {
     }
 
     buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), true);
+
 }
 
 /**
@@ -125,6 +133,10 @@ void RmFileHandle::delete_record(const Rid& rid, Context* context) {
     RmPageHandle page_handle = fetch_page_handle(rid.page_no);
 
     // 2. 更新page_handle.page_hdr中的数据结构
+
+    if(!Bitmap::is_set(page_handle.bitmap,rid.slot_no)){
+        throw RecordNotFoundError(rid.page_no,rid.slot_no);
+    }
 
     Bitmap::reset(page_handle.bitmap, rid.slot_no);
 
@@ -153,9 +165,13 @@ void RmFileHandle::update_record(const Rid& rid, char* buf, Context* context) {
 
     RmPageHandle page_handle = fetch_page_handle(rid.page_no);
 
+    if(!Bitmap::is_set(page_handle.bitmap, rid.slot_no)){
+        throw RecordNotFoundError(rid.page_no,rid.slot_no);
+    }
+
     // 2. 更新记录
 
-    memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
+    std::memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
     
     buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), true);
 }
@@ -173,12 +189,20 @@ RmPageHandle RmFileHandle::fetch_page_handle(int page_no) const {
     // 使用缓冲池获取指定页面，并生成page_handle返回给上层
     // if page_no is invalid, throw PageNotExistError exception
 
+    if(page_no >= RmFileHandle::file_hdr_.num_pages) {
+        throw PageNotExistError("",page_no);
+    }
+
     PageId pagd_id;
 
     pagd_id.fd = fd_;
     pagd_id.page_no = page_no;
 
     Page* page = buffer_pool_manager_->fetch_page(pagd_id);
+
+    if(page == nullptr) {
+        throw PageNotExistError("",page_no);
+    }
 
     return RmPageHandle(&file_hdr_, page);
 }
