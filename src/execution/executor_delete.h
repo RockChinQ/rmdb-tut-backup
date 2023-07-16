@@ -12,10 +12,11 @@ See the Mulan PSL v2 for more details. */
 #include "execution_defs.h"
 #include "execution_manager.h"
 #include "executor_abstract.h"
+#include "exexution_conddep.h"
 #include "index/ix.h"
 #include "system/sm.h"
 
-class DeleteExecutor : public AbstractExecutor {
+class DeleteExecutor : public AbstractExecutor, public ConditionDependedExecutor {
    private:
     TabMeta tab_;                   // 表的元数据
     std::vector<Condition> conds_;  // delete的条件
@@ -38,7 +39,19 @@ class DeleteExecutor : public AbstractExecutor {
 
     std::string getType() override { return "DeleteExecutor"; }
 
+    const std::vector<ColMeta> &cols() const override { return tab_.cols; }
+
     std::unique_ptr<RmRecord> Next() override {
+        
+        std::cout<<"rids_.size(): "<<rids_.size()<<std::endl;
+
+        for (auto &rid : rids_) {
+            std::cout<<"DeleteExecutor Next rid: "<<rid.page_no<<" "<<rid.slot_no<<std::endl;
+            auto record = fh_->get_record(rid, context_);
+            // 删除记录
+            fh_->delete_record(rid, context_);
+        }
+
         return nullptr;
     }
 
