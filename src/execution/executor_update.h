@@ -15,15 +15,15 @@ See the Mulan PSL v2 for more details. */
 #include "index/ix.h"
 #include "system/sm.h"
 
-class UpdateExecutor : public AbstractExecutor {
+class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor {
    private:
     TabMeta tab_;
     std::vector<Condition> conds_;
     RmFileHandle *fh_;
     std::vector<Rid> rids_;
-    std::string tab_name_;
+    // std::string tab_name_;
     std::vector<SetClause> set_clauses_;
-    SmManager *sm_manager_;
+    // SmManager *sm_manager_;
 
    public:
     UpdateExecutor(SmManager *sm_manager, const std::string &tab_name, std::vector<SetClause> set_clauses,
@@ -36,12 +36,54 @@ class UpdateExecutor : public AbstractExecutor {
         conds_ = conds;
         rids_ = rids;
         context_ = context;
+
+        std::cout<<"conds_.size(): "<<conds_.size()<<std::endl;
     }
+
+    // size_t tupleLen() const override { return tab_.tuple_len; }
 
     std::string getType() override { return "UpdateExecutor"; }
 
+    const std::vector<ColMeta> &cols() const override { return tab_.cols; }
+
     std::unique_ptr<RmRecord> Next() override {
-        
+
+        for (auto &rid : rids_) {
+            std::cout<<"UpdateExecutor Next rid: "<<rid.page_no<<" "<<rid.slot_no<<std::endl;
+            auto record = fh_->get_record(rid, context_);
+
+            if (!check_conds(conds_, *record)) {
+                continue;
+            }
+
+            std::cout<<"UpdateExecutor setting"<<std::endl;
+            // 设置每个字段
+            for (auto &set_clause : set_clauses_) {
+                auto col = set_clause.lhs;
+                auto val = set_clause.rhs;
+
+                auto col_meta = sm_manager_->db_.get_table(set_clause.lhs.tab_name).get_col(col.col_name)[0];
+
+                int offset = col_meta.offset;
+                int len = col_meta.len;
+
+                int rlen = 0;
+                if (val.type == TYPE_INT) {
+                    rlen = sizeof(int);
+                } else if (val.type == TYPE_FLOAT) {
+                    rlen = sizeof(float);
+                } else if (val.type == TYPE_STRING) {
+                    rlen = val.str_val.size();
+                }
+
+                val.init_raw(rlen);
+
+                record->set_column_value(offset, len, val.raw->data);
+            }
+
+            fh_->update_record(rid, record.get()->data, context_);
+        }
+
         return nullptr;
     }
 

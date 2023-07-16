@@ -95,4 +95,8 @@ struct RmRecord {
         memcpy(ret, data + offset, len);
         return ret;
     }
+
+    void set_column_value(int offset, int len, char* value) {
+        memcpy(data + offset, value, len);
+    }
 };
