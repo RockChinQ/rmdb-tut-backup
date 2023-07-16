@@ -50,6 +50,24 @@ std::shared_ptr<Query> Analyze::do_analyze(std::shared_ptr<ast::TreeNode> parse)
     } else if (auto x = std::dynamic_pointer_cast<ast::UpdateStmt>(parse)) {
         /** TODO: */
 
+        // 表名
+        query->tables.push_back(x->tab_name);
+
+        // 处理set clause
+        for (auto &sv_set_clause : x->set_clauses) {
+            auto sv_clause = sv_set_clause.get();
+            SetClause set_clause;
+
+            set_clause.lhs = TabCol{.tab_name = x->tab_name, .col_name = sv_clause->col_name};
+            set_clause.rhs = convert_sv_value(sv_clause->val);
+            
+            query->set_clauses.push_back(set_clause);
+        }
+
+        //处理where条件
+        get_clause(x->conds, query->conds);
+        check_clause({x->tab_name}, query->conds);
+
     } else if (auto x = std::dynamic_pointer_cast<ast::DeleteStmt>(parse)) {
         //处理where条件
         get_clause(x->conds, query->conds);

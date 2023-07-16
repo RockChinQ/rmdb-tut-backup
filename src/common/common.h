@@ -85,4 +85,8 @@ struct Condition {
 struct SetClause {
     TabCol lhs;
     Value rhs;
+
+    SetClause() {}
+
+    SetClause(TabCol lhs_, Value rhs_) : lhs(std::move(lhs_)), rhs(std::move(rhs_)) {}
 };

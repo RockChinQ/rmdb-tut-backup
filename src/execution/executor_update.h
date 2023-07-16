@@ -59,6 +59,7 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
             std::cout<<"UpdateExecutor setting"<<std::endl;
             // 设置每个字段
             for (auto &set_clause : set_clauses_) {
+                std::cout<<"UpdateExecutor setting: "<<set_clause.lhs.col_name<<std::endl;
                 auto col = set_clause.lhs;
                 auto val = set_clause.rhs;
 
@@ -69,10 +70,13 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
 
                 int rlen = 0;
                 if (val.type == TYPE_INT) {
+                    std::cout<<"UpdateExecutor setting: "<<val.int_val<<std::endl;
                     rlen = sizeof(int);
                 } else if (val.type == TYPE_FLOAT) {
+                    std::cout<<"UpdateExecutor setting: "<<val.float_val<<std::endl;
                     rlen = sizeof(float);
                 } else if (val.type == TYPE_STRING) {
+                    std::cout<<"UpdateExecutor setting: "<<val.str_val<<std::endl;
                     rlen = val.str_val.size();
                 }
 
