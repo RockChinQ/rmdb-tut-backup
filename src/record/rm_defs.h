@@ -89,4 +89,10 @@ struct RmRecord {
         allocated_ = false;
         data = nullptr;
     }
+
+    char* get_column_value(int offset, int len) {
+        char* ret = new char[len];
+        memcpy(ret, data + offset, len);
+        return ret;
+    }
 };
