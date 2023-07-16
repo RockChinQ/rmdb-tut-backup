@@ -32,15 +32,15 @@ std::unique_ptr<RmRecord> RmFileHandle::get_record(const Rid& rid, Context* cont
 
     auto rm_rcd = std::make_unique<RmRecord>(size);
 
-    std::cout<<"get_record memcpy"<<std::endl;
+    //std::cout<<"get_record memcpy"<<std::endl;
     std::memcpy(rm_rcd->data, page_handle.get_slot(rid.slot_no), size);
-    std::cout<<"get_record memcpy end"<<std::endl;
+    //std::cout<<"get_record memcpy end"<<std::endl;
     rm_rcd->size = size;
     // 3. 返回指向RmRecord的指针
 
     buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), false);
 
-    std::cout<<"page unpinned"<<std::endl;
+    //std::cout<<"page unpinned"<<std::endl;
 
     //return std::make_unique<RmRecord>(size, data);
     return rm_rcd;
