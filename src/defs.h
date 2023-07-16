@@ -56,6 +56,8 @@ class RecScan {
 public:
     virtual ~RecScan() = default;
 
+    virtual void begin() = 0;
+
     virtual void next() = 0;
 
     virtual bool is_end() const = 0;
