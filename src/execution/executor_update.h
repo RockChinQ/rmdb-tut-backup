@@ -37,6 +37,9 @@ class UpdateExecutor : public AbstractExecutor {
         rids_ = rids;
         context_ = context;
     }
+
+    std::string getType() override { return "UpdateExecutor"; }
+
     std::unique_ptr<RmRecord> Next() override {
         
         return nullptr;

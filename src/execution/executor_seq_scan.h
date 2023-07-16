@@ -13,12 +13,13 @@ See the Mulan PSL v2 for more details. */
 #include "execution_defs.h"
 #include "execution_manager.h"
 #include "executor_abstract.h"
+#include "exexution_conddep.h"
 #include "index/ix.h"
 #include "system/sm.h"
 
-class SeqScanExecutor : public AbstractExecutor {
+class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecutor {
    private:
-    std::string tab_name_;              // 表的名称
+    // std::string tab_name_;              // 表的名称
     std::vector<Condition> conds_;      // scan的条件
     RmFileHandle *fh_;                  // 表的数据文件句柄
     std::vector<ColMeta> cols_;         // scan后生成的记录的字段
@@ -28,10 +29,12 @@ class SeqScanExecutor : public AbstractExecutor {
     Rid rid_;
     std::unique_ptr<RecScan> scan_;     // table_iterator
 
-    SmManager *sm_manager_;
+    // SmManager *sm_manager_;
 
    public:
     SeqScanExecutor(SmManager *sm_manager, std::string tab_name, std::vector<Condition> conds, Context *context) {
+        std::cout<<"SeqScanExecutor"<<std::endl;
+
         sm_manager_ = sm_manager;
         tab_name_ = std::move(tab_name);
         conds_ = std::move(conds);
@@ -43,18 +46,37 @@ class SeqScanExecutor : public AbstractExecutor {
         context_ = context;
 
         fed_conds_ = conds_;
+
+        std::cout<<(ConditionDependedExecutor::sm_manager_==nullptr)<<std::endl;
+
+        std::cout<<"SeqScanExecutor end"<<std::endl;
     }
+
+    size_t tupleLen() const override { return len_; }
+
+    std::string getType() override { return "SeqScanExecutor"; }
+
+    const std::vector<ColMeta> &cols() const override { return cols_; }
 
     void beginTuple() override {
         // 为scan_赋值
+        std::cout<<"beginTuple"<<std::endl;
         RmScan *scan = new RmScan(fh_);
         scan_ = std::unique_ptr<RecScan>(scan);
+        std::cout<<"beginTuple end"<<std::endl;
+        scan_->begin();
+        auto rec = scan_.get()->rid();
+        std::cout<<"beginTuple rid "<<rec.page_no<<", "<<rec.slot_no<<std::endl;
+
+        nextTuple();
     }
 
     void nextTuple() override {
         // 先检查此条记录是否满足所有条件
         // 再next下一条
         // 返回的是此条！！！！！！！！！！！！！！！！！
+        scan_->next();
+        std::cout<<"nextTuple"<<std::endl;
         while (!scan_->is_end()) {
             auto rec = scan_.get()->rid();
             auto record = fh_->get_record(rec, context_);
@@ -69,24 +91,38 @@ class SeqScanExecutor : public AbstractExecutor {
                 }
             }
 
-            scan_->next();
+            std::cout<<"rec "<<rec.page_no<<", "<<rec.slot_no<<std::endl;
 
             if (flag) {
                 rid_ = rec;
                 return;
             }
+            scan_->next();
         }
     }
 
+    bool is_end() const override {
+    
+        std::cout<<"executor_seq_scan is_end "<<(scan_->is_end())<<std::endl;
+        return scan_->is_end(); 
+        
+    }
+
     std::unique_ptr<RmRecord> Next() override {
-        nextTuple();
-        if (scan_->is_end()) {
-            return nullptr;
-        }
+        std::cout<<"executor_seq_scan Next"<<std::endl;
+        // nextTuple();
+        // if (scan_->is_end()) {
+        //     std::cout<<"executor_seq_scan Next is_end"<<std::endl;
+        //     return nullptr;
+        // }
 
         auto rec = rid();
 
+        std::cout<<"executor_seq_scan Next rid"<<rec.page_no<<", "<<rec.slot_no<<std::endl;
+
         auto record = fh_->get_record(rec, context_);
+
+        std::cout<<"executor_seq_scan Next end"<<std::endl;
 
         return record;
     }

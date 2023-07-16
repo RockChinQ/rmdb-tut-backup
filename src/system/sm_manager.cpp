@@ -104,7 +104,7 @@ void SmManager::open_db(const std::string& db_name) {
         fhs_.emplace(tab.name, rm_manager_->open_file(tab.name));
 
         // 打开表文件
-        fhs_[tab.name] = rm_manager_->open_file(tab.name);
+        // fhs_[tab.name] = rm_manager_->open_file(tab.name);
 
         // TODO: 加载索引
     }

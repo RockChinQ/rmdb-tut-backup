@@ -36,6 +36,8 @@ class DeleteExecutor : public AbstractExecutor {
         context_ = context;
     }
 
+    std::string getType() override { return "DeleteExecutor"; }
+
     std::unique_ptr<RmRecord> Next() override {
         return nullptr;
     }

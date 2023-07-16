@@ -26,8 +26,16 @@ class ProjectionExecutor : public AbstractExecutor {
     ProjectionExecutor(std::unique_ptr<AbstractExecutor> prev, const std::vector<TabCol> &sel_cols) {
         prev_ = std::move(prev);
 
+        std::cout<<"ProjectionExecutor"<<std::endl;
+
         size_t curr_offset = 0;
+
+        std::cout<<"is prev_ nullptr?"<<(prev_==nullptr)<<std::endl;
+        std::cout<<"what is prev_?"<<prev_->getType()<<std::endl;
+
         auto &prev_cols = prev_->cols();
+
+        std::cout<<"ProjectionExecutor prev_cols size "<<prev_cols.size()<<std::endl;
         for (auto &sel_col : sel_cols) {
             auto pos = get_col(prev_cols, sel_col);
             sel_idxs_.push_back(pos - prev_cols.begin());
@@ -39,12 +47,52 @@ class ProjectionExecutor : public AbstractExecutor {
         len_ = curr_offset;
     }
 
+    // ProjectionExecutor(std::unique_ptr<AbstractExecutor> prev, const std::vector<TabCol> &sel_cols) {
+    //     if (prev == nullptr) {
+    //         std::cout << "prev is nullptr!" << std::endl;
+    //     }
+
+    //     auto &prev_cols = prev_->cols();
+    //     prev_ = std::move(prev);
+
+    //     size_t curr_offset = 0;
+
+    //     if (prev_cols.empty()) {
+    //         std::cout << "prev_cols is empty!" << std::endl;
+    //     }
+
+    //     for (auto &sel_col : sel_cols) {
+    //         auto pos = get_col(prev_cols, sel_col);
+
+    //         if (pos == prev_cols.end()) {
+    //             std::cout << "pos is end!" << std::endl;
+    //         }
+
+    //         sel_idxs_.push_back(pos - prev_cols.begin());
+    //         auto col = *pos;
+    //         col.offset = curr_offset;
+    //         curr_offset += col.len;
+    //         cols_.push_back(col);
+    //     }
+
+    //     len_ = curr_offset;
+
+    //     std::cout << "ProjectionExecutor end" << std::endl;
+    // }
+
+    std::string getType() override { return "ProjectionExecutor"; }
+
+
     void beginTuple() override {
         prev_->beginTuple();
     }
 
     void nextTuple() override {
         prev_->nextTuple();
+    }
+
+    bool is_end() const override {
+        return prev_->is_end();
     }
 
     std::unique_ptr<RmRecord> Next() override {
@@ -61,5 +109,9 @@ class ProjectionExecutor : public AbstractExecutor {
         return new_record;
     }
 
+    const std::vector<ColMeta> &cols() const override { return cols_; }
+
     Rid &rid() override { return _abstract_rid; }
+
+    size_t tupleLen() const override { return len_; }
 };

@@ -64,6 +64,8 @@ class IndexScanExecutor : public AbstractExecutor {
         fed_conds_ = conds_;
     }
 
+    std::string getType() override { return "IndexScanExecutor"; }
+
     void beginTuple() override {
         
     }
