@@ -64,6 +64,10 @@ Rid RmFileHandle::insert_record(char* buf, Context* context) {
 
     int slot_no = Bitmap::first_bit(false, spare_page_handle.bitmap, file_hdr_.num_records_per_page);
 
+    if(slot_no == file_hdr_.num_records_per_page){ 
+        throw InvalidSlotNoError(slot_no, file_hdr_.num_records_per_page);
+    }
+
     // 3. 将buf复制到空闲slot位置
 
     std::memcpy(spare_page_handle.get_slot(slot_no), buf, file_hdr_.record_size);
