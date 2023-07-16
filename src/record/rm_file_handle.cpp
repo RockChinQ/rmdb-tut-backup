@@ -31,7 +31,7 @@ std::unique_ptr<RmRecord> RmFileHandle::get_record(const Rid& rid, Context* cont
     char* data = new char[size];
 
     std::cout<<"get_record memcpy"<<std::endl;
-    memcpy(data, page_handle.get_slot(rid.slot_no), size);
+    std::memcpy(data, page_handle.get_slot(rid.slot_no), size);
     std::cout<<"get_record memcpy end"<<std::endl;
 
     // 3. 返回指向RmRecord的指针
@@ -63,7 +63,7 @@ Rid RmFileHandle::insert_record(char* buf, Context* context) {
 
     // 3. 将buf复制到空闲slot位置
 
-    memcpy(spare_page_handle.get_slot(slot_no), buf, file_hdr_.record_size);
+    std::memcpy(spare_page_handle.get_slot(slot_no), buf, file_hdr_.record_size);
     Bitmap::set(spare_page_handle.bitmap, slot_no);
 
     // 4. 更新page_handle.page_hdr中的数据结构
@@ -93,7 +93,7 @@ void RmFileHandle::insert_record(const Rid& rid, char* buf) {
 
     RmPageHandle page_handle = fetch_page_handle(rid.page_no);
 
-    memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
+    std::memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
 
     bool is_set_ = Bitmap::is_set(page_handle.bitmap, rid.slot_no);
 
@@ -163,7 +163,7 @@ void RmFileHandle::update_record(const Rid& rid, char* buf, Context* context) {
 
     // 2. 更新记录
 
-    memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
+    std::memcpy(page_handle.get_slot(rid.slot_no), buf, file_hdr_.record_size);
     
     buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), true);
 }
