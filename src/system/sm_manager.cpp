@@ -85,7 +85,29 @@ void SmManager::drop_db(const std::string& db_name) {
  * @param {string&} db_name 数据库名称，与文件夹同名
  */
 void SmManager::open_db(const std::string& db_name) {
-    
+    // 检查是否存在db_name/目录
+    if (!is_dir(db_name)) {
+        throw DatabaseNotFoundError(db_name);
+    }
+    // 进入db_name/目录
+    if (chdir(db_name.c_str()) < 0) {
+        throw UnixError();
+    }
+
+    // 读取数据库元数据
+    std::ifstream ifs(DB_META_NAME);
+    ifs >> db_;
+
+    // 加载表元数据
+    for (auto &entry : db_.tabs_) {
+        auto &tab = entry.second;
+        fhs_.emplace(tab.name, rm_manager_->open_file(tab.name));
+
+        // 打开表文件
+        // fhs_[tab.name] = rm_manager_->open_file(tab.name);
+
+        // TODO: 加载索引
+    }
 }
 
 /**
@@ -101,6 +123,28 @@ void SmManager::flush_meta() {
  * @description: 关闭数据库并把数据落盘
  */
 void SmManager::close_db() {
+    // flush所有脏page
+    for (auto &rm_file : fhs_) {
+        buffer_pool_manager_->flush_all_pages(rm_file.second->GetFd());
+    }
+    // 刷新元数据
+    flush_meta();
+
+    // 回到根目录
+
+    if (chdir("..") < 0) {
+        throw UnixError();
+    }
+
+    // 关闭所有表文件
+
+    for (auto &rm_file : fhs_) {
+        rm_manager_->close_file(rm_file.second.get());
+    }
+    fhs_.clear();
+
+    //TODO: 关闭日志文件
+
     
 }
 
@@ -110,6 +154,7 @@ void SmManager::close_db() {
  */
 void SmManager::show_tables(Context* context) {
     std::fstream outfile;
+    
     outfile.open("output.txt", std::ios::out | std::ios::app);
     outfile << "| Tables |\n";
     RecordPrinter printer(1);

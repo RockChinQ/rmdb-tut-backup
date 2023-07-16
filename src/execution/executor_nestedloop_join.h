@@ -43,6 +43,8 @@ class NestedLoopJoinExecutor : public AbstractExecutor {
 
     }
 
+    std::string getType() override { return "NestedLoopJoinExecutor"; }
+
     void beginTuple() override {
 
     }

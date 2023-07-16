@@ -37,6 +37,8 @@ class InsertExecutor : public AbstractExecutor {
         context_ = context;
     };
 
+    std::string getType() override { return "InsertExecutor"; }
+
     std::unique_ptr<RmRecord> Next() override {
         // Make record buffer
         RmRecord rec(fh_->get_file_hdr().record_size);

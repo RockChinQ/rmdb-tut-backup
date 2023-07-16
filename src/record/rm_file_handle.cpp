@@ -30,11 +30,15 @@ std::unique_ptr<RmRecord> RmFileHandle::get_record(const Rid& rid, Context* cont
     // 将page_handle的slots中的slot_no对应的数据复制到record中
     char* data = new char[size];
 
+    std::cout<<"get_record memcpy"<<std::endl;
     memcpy(data, page_handle.get_slot(rid.slot_no), size);
+    std::cout<<"get_record memcpy end"<<std::endl;
 
     // 3. 返回指向RmRecord的指针
 
     buffer_pool_manager_->unpin_page(page_handle.page->get_page_id(), false);
+
+    std::cout<<"page unpinned"<<std::endl;
 
     return std::make_unique<RmRecord>(size, data);
 }

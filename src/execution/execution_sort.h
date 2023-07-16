@@ -33,6 +33,8 @@ class SortExecutor : public AbstractExecutor {
         used_tuple.clear();
     }
 
+    std::string getType() override { return "SortExecutor"; }
+
     void beginTuple() override { 
         
     }

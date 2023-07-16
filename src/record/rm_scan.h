@@ -20,6 +20,8 @@ class RmScan : public RecScan {
 public:
     RmScan(const RmFileHandle *file_handle);
 
+    void begin() override;
+
     void next() override;
 
     bool is_end() const override;
