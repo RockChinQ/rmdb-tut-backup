@@ -17,6 +17,8 @@ See the Mulan PSL v2 for more details. */
 
 class AbstractExecutor {
    public:
+    std::string tab_name_;
+    SmManager *sm_manager_;
     Rid _abstract_rid;
 
     Context *context_;
@@ -53,4 +55,163 @@ class AbstractExecutor {
         }
         return pos;
     }
+    
+    Value get_record_value(const RmRecord &record, const TabCol &col) {
+        Value val;
+
+        auto col_meta = sm_manager_->db_.get_table(tab_name_).get_col(col.col_name)[0];
+        
+        val.type = col_meta.type;
+        
+        if (col_meta.type == TYPE_INT) {
+            val.set_int(*(int *)(record.data + col_meta.offset));
+        } else if (col_meta.type == TYPE_FLOAT) {
+            val.set_float(*(float *)(record.data + col_meta.offset));
+        } else if (col_meta.type == TYPE_STRING) {
+            val.set_str(std::string(record.data + col_meta.offset));
+        }
+
+        // TODO: BIGINT
+
+        return val;
+    }
+
+    bool check_cond(const Condition &cond, const RmRecord &record) {
+        Value left = get_record_value(record, cond.lhs_col);
+
+        Value right;
+
+        if (cond.is_rhs_val) {
+            right = cond.rhs_val;
+        } else {
+            right = get_record_value(record, cond.rhs_col);
+        }
+
+        switch (cond.op) {
+            case OP_EQ:
+                return eq(left, right);
+                break;
+            case OP_NE:
+                return ne(left, right);
+                break;
+            case OP_LT:
+                return lt(left, right);
+                break;
+            case OP_GT:
+                return gt(left, right);
+                break;
+            case OP_LE:
+                return le(left, right);
+                break;
+            case OP_GE:
+                return ge(left, right);
+                break;
+            default:
+                return false;
+                break;
+        }
+    }
+
+    bool eq(const Value &left, const Value &right) {
+        if (left.type != right.type) {
+            return false;
+        }
+
+        switch (left.type) {
+            case TYPE_INT:
+                return left.int_val == right.int_val;
+            case TYPE_FLOAT:
+                return left.float_val == right.float_val;
+            case TYPE_STRING:
+                return left.str_val == right.str_val;
+            default:
+                return false;
+        }
+    }
+
+    bool ne(const Value &left, const Value &right) {
+        if (left.type != right.type) {
+            return true;
+        }
+
+        switch (left.type) {
+            case TYPE_INT:
+                return left.int_val != right.int_val;
+            case TYPE_FLOAT:
+                return left.float_val != right.float_val;
+            case TYPE_STRING:
+                return left.str_val != right.str_val;
+            default:
+                return true;
+        }
+    }
+
+    bool lt(const Value &left, const Value &right) {
+        if (left.type != right.type) {
+            return false;
+        }
+
+        switch (left.type) {
+            case TYPE_INT:
+                return left.int_val < right.int_val;
+            case TYPE_FLOAT:
+                return left.float_val < right.float_val;
+            case TYPE_STRING:
+                return left.str_val < right.str_val;
+            default:
+                return false;
+        }
+    }
+
+    bool gt(const Value &left, const Value &right) {
+        if (left.type != right.type) {
+            return false;
+        }
+
+        switch (left.type) {
+            case TYPE_INT:
+                return left.int_val > right.int_val;
+            case TYPE_FLOAT:
+                return left.float_val > right.float_val;
+            case TYPE_STRING:
+                return left.str_val > right.str_val;
+            default:
+                return false;
+        }
+    }
+
+    bool le(const Value &left, const Value &right) {
+        if (left.type != right.type) {
+            return false;
+        }
+
+        switch (left.type) {
+            case TYPE_INT:
+                return left.int_val <= right.int_val;
+            case TYPE_FLOAT:
+                return left.float_val <= right.float_val;
+            case TYPE_STRING:
+                return left.str_val <= right.str_val;
+            default:
+                return false;
+        }
+    }
+
+    bool ge(const Value &left, const Value &right) {
+        if (left.type != right.type) {
+            return false;
+        }
+
+        switch (left.type) {
+            case TYPE_INT:
+                return left.int_val >= right.int_val;
+            case TYPE_FLOAT:
+                return left.float_val >= right.float_val;
+            case TYPE_STRING:
+                return left.str_val >= right.str_val;
+            default:
+                return false;
+        }
+    }
+    
 };
