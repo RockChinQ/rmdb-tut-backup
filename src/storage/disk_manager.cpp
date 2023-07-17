@@ -152,10 +152,10 @@ void DiskManager::destroy_file(const std::string &path) {
         throw FileNotFoundError(path);
     }
 
-    // if (path2fd_.count(path) > 0){
-    //     // 关闭文件
-    //     close_file(path2fd_[path]);
-    // }
+    if (path2fd_.count(path) > 0){
+        // 关闭文件
+        close_file(path2fd_[path]);
+    }
 
     if(path2fd_.count(path)) {
         throw FileNotClosedError(path);

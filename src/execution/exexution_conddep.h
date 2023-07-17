@@ -75,10 +75,14 @@ class ConditionDependedExecutor {
 
             cp_res = left.float_val - right.float_val;
         } else if (left.type == TYPE_STRING && right.type == TYPE_STRING) {
-            cp_res = right.str_val.compare(left.str_val);
+            cp_res = left.str_val.compare(right.str_val);
+
+            std::cout<<"check_cond: "<<left.str_val<<" "<<right.str_val<<std::endl;
         } else {
             throw InternalError("Unexpected field type");
         }
+
+        std::cout<<"check_cond: "<<cp_res<<std::endl;
 
         switch (cond.op) {
             case OP_EQ:
