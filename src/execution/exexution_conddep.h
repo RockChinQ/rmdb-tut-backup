@@ -11,13 +11,38 @@ class ConditionDependedExecutor {
     public:
         ConditionDependedExecutor() = default;
         ConditionDependedExecutor(std::string tab_name, SmManager *sm_manager) : tab_name_(tab_name), sm_manager_(sm_manager) {}
-        
+
+    Value get_record_value(const RmRecord &record, int offset, int len, ColType type){
+        Value val;
+        val.type = type;
+
+        if (type == TYPE_INT) {
+            val.set_int(*(int *)(record.data + offset));
+        } else if (type == TYPE_FLOAT) {
+            val.set_float(*(float *)(record.data + offset));
+        } else if (type == TYPE_STRING) {
+            val.set_str(std::string(record.data + offset, len));
+        }
+
+        return val;
+    }
     
     Value get_record_value(const RmRecord &record, const TabCol &col) {
         Value val;
 
-        auto col_meta = sm_manager_->db_.get_table(tab_name_).get_col(col.col_name)[0];
+        std::cout<<"get_record_value: "<<col.col_name<<std::endl;
+        std::cout<<"tab_name: "<<col.tab_name<<std::endl;
+
+        try{
+            std::cout<<"is sm_manager_ null?"<<(sm_manager_ == nullptr)<<std::endl;
         
+            std::cout<<"size of cols:"<<sm_manager_->db_.get_table(col.tab_name).get_col(col.col_name).base()->len<<std::endl;
+        }catch (TableNotFoundError &e){
+            std::cout<<"table not found"<<std::endl;
+        }
+
+        auto col_meta = sm_manager_->db_.get_table(col.tab_name).get_col(col.col_name)[0];
+
         val.type = col_meta.type;
         
         if (col_meta.type == TYPE_INT) {
@@ -47,18 +72,12 @@ class ConditionDependedExecutor {
         return true;
     }
 
-    bool check_cond(const Condition &cond, const RmRecord &record) {
-        Value left = get_record_value(record, cond.lhs_col);
-
-        Value right;
-
-        if (cond.is_rhs_val) {
-            right = cond.rhs_val;
-        } else {
-            right = get_record_value(record, cond.rhs_col);
-        }
+    bool check_cond(Value left, Value right, Condition cond){
 
         // 把双方的int都转成float
+
+        std::cout<<"left.type: "<<left.type<<" right.type: "<<right.type<<std::endl;
+        std::cout<<"TYPE_INT:"<<TYPE_INT<<" TYPE_FLOAT:"<<TYPE_FLOAT<<" TYPE_STRING:"<<TYPE_STRING<<std::endl;
 
         if (left.type == TYPE_INT && right.type == TYPE_FLOAT) {
             left.set_float(left.int_val);
@@ -79,7 +98,8 @@ class ConditionDependedExecutor {
 
             std::cout<<"check_cond: "<<left.str_val<<" "<<right.str_val<<std::endl;
         } else {
-            throw InternalError("Unexpected field type");
+            std::cout<<"left.type: "<<left.type<<" right.type: "<<right.type<<std::endl;
+            throw InternalError("Unexpected value pair field type");
         }
 
         std::cout<<"check_cond: "<<cp_res<<std::endl;
@@ -98,8 +118,25 @@ class ConditionDependedExecutor {
             case OP_GE:
                 return cp_res >= 0;
             default:
-                throw InternalError("Unexpected field type");
+                throw InternalError("Unexpected cond.op field type");
         }
+    }
+
+    bool check_cond(const Condition &cond, const RmRecord &record) {
+        Value left = get_record_value(record, cond.lhs_col);
+
+        Value right;
+
+        if (cond.is_rhs_val) {
+            right = cond.rhs_val;
+        } else {
+            right = get_record_value(record, cond.rhs_col);
+        }
+        return check_cond(left, right, cond);
+    }
+
+    SmManager *get_sm_manager() {
+        return sm_manager_;
     }
 
     // bool check_conds(const std::vector<Condition> &conds, const RmRecord &left, const RmRecord &right) {

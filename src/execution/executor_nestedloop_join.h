@@ -42,6 +42,13 @@ class NestedLoopJoinExecutor : public AbstractExecutor, public ConditionDepended
         isend = false;
         fed_conds_ = std::move(conds);
 
+        // 将left转换成ConditionDependedExecutor
+        // auto cde_left = std::make_unique<ConditionDependedExecutor>();
+
+        // sm_manager_ = cde_left->get_sm_manager();
+
+        // std::cout<<"*** is sm_manager_ null?"<<(sm_manager_ == nullptr)<<std::endl;
+
     }
 
     std::string getType() override { return "NestedLoopJoinExecutor"; }
@@ -123,25 +130,75 @@ class NestedLoopJoinExecutor : public AbstractExecutor, public ConditionDepended
             auto lrec = left_->Next();
             auto rrec = right_->Next();
 
+            std::cout<<"left rid("<<left_->rid().page_no<<" "<<left_->rid().slot_no<<") right rid("<<right_->rid().page_no<<" "<<right_->rid().slot_no<<")"<<std::endl;
+
             // 伪装一个cond出来
             // which 左边是左表的列，右边是右表的列值
-            std::vector<Condition> conds;
-            for (auto &cond : fed_conds_) {
-                Condition new_cond;
+            // std::vector<Condition> conds;
+            // for (auto &cond : fed_conds_) {
+            //     std::cout<<"making fake cond"<<std::endl;
+            //     Condition new_cond;
                 
-                new_cond.lhs_col = cond.lhs_col;
-                new_cond.is_rhs_val = true;
+            //     new_cond.lhs_col = cond.lhs_col;
+            //     new_cond.is_rhs_val = true;
 
-                if (cond.is_rhs_val) {
-                    new_cond.rhs_val = cond.rhs_val;
-                } else {
-                    new_cond.rhs_val = get_record_value(*(rrec.get()), cond.rhs_col);
+            //     if (cond.is_rhs_val) {
+            //         new_cond.rhs_val = cond.rhs_val;
+            //     } else {
+            //         std::cout<<"get_record_value"<<std::endl;
+            //         new_cond.rhs_val = get_record_value(*(rrec.get()), cond.rhs_col);
+            //         std::cout<<"get_record_value end"<<std::endl;
+            //     }
+
+            //     conds.push_back(new_cond);
+            //     std::cout<<"fake cond made;"<<std::endl;
+            // }
+            // std::cout<<"fake cond made, check conds"<<std::endl;
+
+            bool flag = true;
+
+            for (auto &cond : fed_conds_){
+
+                std::cout<<"checking cond:"<<cond.lhs_col.col_name<<" "<<cond.op<<" "<<cond.rhs_col.col_name<<" "<<cond.is_rhs_val<<std::endl;
+                // 从左表中查出此字段信息
+                int left_off=0, left_len = 0;
+                ColType left_type;
+
+                auto col_meta = left_.get()->cols();
+                for (auto &lcol : col_meta){
+                    std::cout<<"***** matching left col:"<<lcol.tab_name<<" "<<lcol.name<<" "<<cond.lhs_col.col_name<<std::endl;
+                    if (lcol.name.compare(cond.lhs_col.col_name)==0){
+                        left_off = lcol.offset;
+                        left_len = lcol.len;
+                        left_type = lcol.type;
+                        std::cout<<"left col found: off:"<<left_off<<" len:"<<left_len<<" type:"<<left_type<<std::endl;
+                    }
                 }
 
-                conds.push_back(new_cond);
+                int right_off=0, right_len = 0;
+                ColType right_type;
+
+                col_meta = right_.get()->cols();
+                for (auto &rcol : col_meta){
+                    if (rcol.name.compare(cond.rhs_col.col_name)==0){
+                        right_off = rcol.offset;
+                        right_len = rcol.len;
+                        right_type = rcol.type;
+                        std::cout<<"right col found: off:"<<right_off<<" len:"<<right_len<<" type:"<<right_type<<std::endl;
+                    }
+                }
+
+                Value left_val = get_record_value(*lrec.get(), left_off, left_len, left_type);
+                Value right_val = get_record_value(*rrec.get(), right_off, right_len, right_type);
+
+                if (!check_cond(left_val, right_val, cond)){
+                    flag = false;
+                    break;
+                }
+
             }
 
-            if (check_conds(conds, *lrec.get())) {
+            if (flag) {
                 // 符合条件，返回
                 std::cout<<"return l("<<left_->rid().page_no<<" "<<left_->rid().slot_no<<") r("<<right_->rid().page_no<<" "<<right_->rid().slot_no<<")"<<std::endl;
                 
