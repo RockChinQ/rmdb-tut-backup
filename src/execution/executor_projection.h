@@ -88,7 +88,10 @@ class ProjectionExecutor : public AbstractExecutor {
     }
 
     void nextTuple() override {
+        std::cout<<"ProjectionExecutor nextTuple: is prev_ null"<<(prev_==nullptr)<<std::endl;
+        std::cout<<"prev type: "<<prev_->getType()<<std::endl;
         prev_->nextTuple();
+        std::cout<<"ProjectionExecutor nextTuple end"<<std::endl;
     }
 
     bool is_end() const override {
@@ -96,16 +99,21 @@ class ProjectionExecutor : public AbstractExecutor {
     }
 
     std::unique_ptr<RmRecord> Next() override {
+        std::cout<<"ProjectionExecutor Next"<<std::endl;
         auto record = prev_->Next();
         if (record == nullptr) {
             return nullptr;
         }
+        std::cout<<"ProjectionExecutor making new record"<<std::endl;
         auto new_record = std::make_unique<RmRecord>(len_);
         for (size_t i = 0; i < sel_idxs_.size(); i++) {
+            std::cout<<"ProjectionExecutor Next i: "<<i<<" size of prev_cols: "<<prev_->cols().size()<<" sel_idxs_[i]: "<<sel_idxs_[i]<<std::endl;
             auto &col = cols_[i];
             auto &prev_col = prev_->cols()[sel_idxs_[i]];
             memcpy(new_record->data + col.offset, record->data + prev_col.offset, col.len);
         }
+        std::cout<<"ProjectionExecutor Next end"<<std::endl;
+        std::cout<<"is new_record nullptr?"<<(new_record==nullptr)<<std::endl;
         return new_record;
     }
 

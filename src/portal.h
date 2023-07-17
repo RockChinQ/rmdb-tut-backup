@@ -135,7 +135,9 @@ class Portal
 
             case PORTAL_DML_WITHOUT_SELECT:
             {
+                std::cout<<"Portal run dml"<<std::endl;
                 ql->run_dml(std::move(portal->root));
+                std::cout<<"Portal run dml end"<<std::endl;
                 break;
             }
             case PORTAL_MULTI_QUERY:

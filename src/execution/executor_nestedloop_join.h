@@ -12,10 +12,11 @@ See the Mulan PSL v2 for more details. */
 #include "execution_defs.h"
 #include "execution_manager.h"
 #include "executor_abstract.h"
+#include "exexution_conddep.h"
 #include "index/ix.h"
 #include "system/sm.h"
 
-class NestedLoopJoinExecutor : public AbstractExecutor {
+class NestedLoopJoinExecutor : public AbstractExecutor, public ConditionDependedExecutor {
    private:
     std::unique_ptr<AbstractExecutor> left_;    // 左儿子节点（需要join的表）
     std::unique_ptr<AbstractExecutor> right_;   // 右儿子节点（需要join的表）
@@ -45,16 +46,187 @@ class NestedLoopJoinExecutor : public AbstractExecutor {
 
     std::string getType() override { return "NestedLoopJoinExecutor"; }
 
-    void beginTuple() override {
+    const std::vector<ColMeta> &cols() const override { return cols_; }
 
+    void beginTuple() override {
+        left_->beginTuple();
+        right_->beginTuple();
+
+        // left_->nextTuple();
+        // right_->nextTuple();
     }
 
     void nextTuple() override {
-        
+        // std::cout<<"left cols tab_name: "<<left_.get()->cols()[0].tab_name<<std::endl;
+        // for (;!left_->is_end();) {
+        //     std::cout<<"left rid: "<<left_->rid().page_no<<" "<<left_->rid().slot_no<<std::endl;
+        //     std::cout<<"right is_end: "<<right_->is_end()<<std::endl;
+        //     for (;!right_->is_end();) {
+        //         std::cout<<"right rid: "<<right_->rid().page_no<<" "<<right_->rid().slot_no<<std::endl;
+
+        //         auto lrec = left_->Next();
+        //         auto rrec = right_->Next();
+
+        //         // 伪装一个cond出来
+        //         // which 左边是左表的列，右边是右表的列值
+        //         std::vector<Condition> conds;
+        //         for (auto &cond : fed_conds_) {
+        //             Condition new_cond;
+                    
+        //             new_cond.lhs_col = cond.lhs_col;
+        //             new_cond.is_rhs_val = true;
+
+        //             if (cond.is_rhs_val) {
+        //                 new_cond.rhs_val = cond.rhs_val;
+        //             } else {
+        //                 new_cond.rhs_val = get_record_value(*(rrec.get()), cond.rhs_col);
+        //             }
+
+        //             conds.push_back(new_cond);
+        //         }
+
+        //         if (check_conds(conds, *lrec.get())) {
+        //             // 符合条件，返回
+        //             std::cout<<"return l("<<left_->rid().page_no<<" "<<left_->rid().slot_no<<") r("<<right_->rid().page_no<<" "<<right_->rid().slot_no<<")"<<std::endl;
+                    
+        //             right_->nextTuple();
+        //             return;
+        //         }
+
+        //         right_->nextTuple();
+        //     }
+        //     right_->beginTuple();
+        //     left_->nextTuple();
+        // }
+        // isend = true;
+        // right_->nextTuple();
+        // if (right_->is_end()) {
+        //     left_->nextTuple();
+        //     right_->beginTuple();
+        // }
+        std::cout<<"NestedLoopJoinExecutor nextTuple"<<std::endl;
+        while(true){
+            left_->nextTuple();
+
+            if (left_->is_end()) {
+                right_->nextTuple();
+                left_->beginTuple();
+                if (right_->is_end()) {
+                    isend = true;
+                    return;
+                }
+            }
+
+            // std::cout<<"left rid: "<<left_->rid().page_no<<" "<<left_->rid().slot_no<<std::endl;
+            std::cout<<"nlje sub next"<<std::endl;
+
+            auto lrec = left_->Next();
+            auto rrec = right_->Next();
+
+            // 伪装一个cond出来
+            // which 左边是左表的列，右边是右表的列值
+            std::vector<Condition> conds;
+            for (auto &cond : fed_conds_) {
+                Condition new_cond;
+                
+                new_cond.lhs_col = cond.lhs_col;
+                new_cond.is_rhs_val = true;
+
+                if (cond.is_rhs_val) {
+                    new_cond.rhs_val = cond.rhs_val;
+                } else {
+                    new_cond.rhs_val = get_record_value(*(rrec.get()), cond.rhs_col);
+                }
+
+                conds.push_back(new_cond);
+            }
+
+            if (check_conds(conds, *lrec.get())) {
+                // 符合条件，返回
+                std::cout<<"return l("<<left_->rid().page_no<<" "<<left_->rid().slot_no<<") r("<<right_->rid().page_no<<" "<<right_->rid().slot_no<<")"<<std::endl;
+                
+                return;
+            }
+        }
+    }
+
+    bool is_end() const override {
+        bool end = right_->is_end();
+        std::cout<<"NestedLoopJoinExecutor is_end: "<<end<<std::endl;
+        return end;
     }
 
     std::unique_ptr<RmRecord> Next() override {
-        return nullptr;
+
+
+        RmRecord new_rec(len_);
+
+        if (is_end()) {
+            return nullptr;
+        }
+
+        std::cout<<"===============NEXT"<<std::endl;
+        std::cout<<"===============L("<<left_->rid().page_no<<" "<<left_->rid().slot_no<<") R("<<right_->rid().page_no<<" "<<right_->rid().slot_no<<")"<<std::endl;
+
+        auto lrec = left_->Next();
+        auto rrec = right_->Next();
+
+        for (auto &col : cols_) {
+            std::cout<<"NestedLoopJoinExecutor Next col: "<<col.name<<" tab_name: "<<col.tab_name<<std::endl;
+
+            // 将左右转换成ConditionDependedExecutor
+
+
+            if (col.offset < left_->tupleLen()) {
+                // 左表
+                std::cout<<"left"<<std::endl;
+                // 查找此列在左表中的位置
+                auto col_meta = left_.get()->cols();
+                for (auto &c : col_meta) {
+                    if (c.name.compare(col.name) == 0) {
+
+                        std::cout<<"## set res col val: col.off: "<<col.offset<<" col.len: "<<col.len<<" lrec.off: "<<c.offset<<" lrec.len: "<<c.len<<" col.name: "<<col.name<<std::endl;
+                        new_rec.set_column_value(
+                            col.offset,
+                            col.len,
+                            lrec->get_column_value(
+                                c.offset,
+                                c.len
+                            )
+                        );
+                        break;
+                    }
+                }
+
+            } else {
+                // 右表
+                std::cout<<"right"<<std::endl;
+                // 查找此列在右表中的位置
+                auto col_meta = right_.get()->cols();
+                for (auto &c : col_meta) {
+                    if (c.name.compare(col.name) == 0) {
+
+                        std::cout<<"## set res col val: col.off: "<<col.offset<<" col.len: "<<col.len<<" rrec.off: "<<c.offset<<" rrec.len: "<<c.len<<" col.name: "<<col.name<<std::endl;
+                        new_rec.set_column_value(
+                            col.offset,
+                            col.len,
+                            rrec->get_column_value(
+                                c.offset,
+                                c.len
+                            )
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+
+        auto unique_ptr_new_rec = std::make_unique<RmRecord>(new_rec);
+
+        std::cout<<"===============NEXT END"<<std::endl;
+        std::cout<<"is unique_ptr_new_rec null: "<<(unique_ptr_new_rec == nullptr)<<std::endl;
+
+        return unique_ptr_new_rec;
     }
 
     Rid &rid() override { return _abstract_rid; }

@@ -102,4 +102,13 @@ class ConditionDependedExecutor {
         }
     }
 
+    // bool check_conds(const std::vector<Condition> &conds, const RmRecord &left, const RmRecord &right) {
+    //     for (auto &cond : conds) {
+    //         if (!check_cond(cond, left, right)) {
+    //             return false;
+    //         }
+    //     }
+    //     return true;
+    // }
+
 };
