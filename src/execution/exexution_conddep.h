@@ -30,15 +30,8 @@ class ConditionDependedExecutor {
     Value get_record_value(const RmRecord &record, const TabCol &col) {
         Value val;
 
-        std::cout<<"get_record_value: "<<col.col_name<<std::endl;
-        std::cout<<"tab_name: "<<col.tab_name<<std::endl;
-
         try{
-            std::cout<<"is sm_manager_ null?"<<(sm_manager_ == nullptr)<<std::endl;
-        
-            std::cout<<"size of cols:"<<sm_manager_->db_.get_table(col.tab_name).get_col(col.col_name).base()->len<<std::endl;
         }catch (TableNotFoundError &e){
-            std::cout<<"table not found"<<std::endl;
         }
 
         auto col_meta = sm_manager_->db_.get_table(col.tab_name).get_col(col.col_name)[0];
@@ -64,7 +57,6 @@ class ConditionDependedExecutor {
 
     bool check_conds(const std::vector<Condition> &conds, const RmRecord &record) {
         for (auto &cond : conds) {
-            std::cout<<"check_conds: "<<cond.lhs_col.col_name<<std::endl;
             if (!check_cond(cond, record)) {
                 return false;
             }
@@ -75,10 +67,6 @@ class ConditionDependedExecutor {
     bool check_cond(Value left, Value right, Condition cond){
 
         // 把双方的int都转成float
-
-        std::cout<<"left.type: "<<left.type<<" right.type: "<<right.type<<std::endl;
-        std::cout<<"TYPE_INT:"<<TYPE_INT<<" TYPE_FLOAT:"<<TYPE_FLOAT<<" TYPE_STRING:"<<TYPE_STRING<<std::endl;
-
         if (left.type == TYPE_INT && right.type == TYPE_FLOAT) {
             left.set_float(left.int_val);
         } else if (left.type == TYPE_FLOAT && right.type == TYPE_INT) {
@@ -96,13 +84,9 @@ class ConditionDependedExecutor {
         } else if (left.type == TYPE_STRING && right.type == TYPE_STRING) {
             cp_res = left.str_val.compare(right.str_val);
 
-            std::cout<<"check_cond: "<<left.str_val<<" "<<right.str_val<<std::endl;
         } else {
-            std::cout<<"left.type: "<<left.type<<" right.type: "<<right.type<<std::endl;
             throw InternalError("Unexpected value pair field type");
         }
-
-        std::cout<<"check_cond: "<<cp_res<<std::endl;
 
         switch (cond.op) {
             case OP_EQ:

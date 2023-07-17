@@ -62,7 +62,6 @@ class NestedLoopJoinExecutor : public AbstractExecutor, public ConditionDepended
     }
 
     void nextTuple() override {
-        std::cout<<"NestedLoopJoinExecutor nextTuple"<<std::endl;
         while(true){
             left_->nextTuple();
 
