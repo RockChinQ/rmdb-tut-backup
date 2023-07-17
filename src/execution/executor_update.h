@@ -37,7 +37,6 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
         rids_ = rids;
         context_ = context;
 
-        std::cout<<"conds_.size(): "<<conds_.size()<<std::endl;
     }
 
     // size_t tupleLen() const override { return tab_.tuple_len; }
@@ -49,17 +48,14 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
     std::unique_ptr<RmRecord> Next() override {
 
         for (auto &rid : rids_) {
-            std::cout<<"UpdateExecutor Next rid: "<<rid.page_no<<" "<<rid.slot_no<<std::endl;
             auto record = fh_->get_record(rid, context_);
 
             if (!check_conds(conds_, *record)) {
                 continue;
             }
 
-            std::cout<<"UpdateExecutor setting"<<std::endl;
             // 设置每个字段
             for (auto &set_clause : set_clauses_) {
-                std::cout<<"UpdateExecutor setting: "<<set_clause.lhs.col_name<<std::endl;
                 auto col = set_clause.lhs;
                 auto val = set_clause.rhs;
 
@@ -70,13 +66,10 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
 
                 int rlen = 0;
                 if (val.type == TYPE_INT) {
-                    std::cout<<"UpdateExecutor setting: "<<val.int_val<<std::endl;
                     rlen = sizeof(int);
                 } else if (val.type == TYPE_FLOAT) {
-                    std::cout<<"UpdateExecutor setting: "<<val.float_val<<std::endl;
                     rlen = sizeof(float);
                 } else if (val.type == TYPE_STRING) {
-                    std::cout<<"UpdateExecutor setting: "<<val.str_val<<std::endl;
                     rlen = val.str_val.size();
                 }
 
