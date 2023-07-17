@@ -43,10 +43,8 @@ class DeleteExecutor : public AbstractExecutor, public ConditionDependedExecutor
 
     std::unique_ptr<RmRecord> Next() override {
         
-        std::cout<<"rids_.size(): "<<rids_.size()<<std::endl;
 
         for (auto &rid : rids_) {
-            std::cout<<"DeleteExecutor Next rid: "<<rid.page_no<<" "<<rid.slot_no<<std::endl;
             auto record = fh_->get_record(rid, context_);
             // 删除记录
             fh_->delete_record(rid, context_);

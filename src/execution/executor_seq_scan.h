@@ -30,6 +30,7 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
     std::unique_ptr<RecScan> scan_;     // table_iterator
 
     // SmManager *sm_manager_;
+    bool isend;
 
    public:
     SeqScanExecutor(SmManager *sm_manager, std::string tab_name, std::vector<Condition> conds, Context *context) {
@@ -41,11 +42,14 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
         fh_ = sm_manager_->fhs_.at(tab_name_).get();
         cols_ = tab.cols;
         len_ = cols_.back().offset + cols_.back().len;
+        isend = false;
 
         context_ = context;
 
         fed_conds_ = conds_;
 
+        RmScan *scan = new RmScan(fh_);
+        scan_ = std::unique_ptr<RecScan>(scan);
     }
 
     size_t tupleLen() const override { return len_; }
@@ -56,11 +60,13 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
 
     void beginTuple() override {
         // 为scan_赋值
-        RmScan *scan = new RmScan(fh_);
-        scan_ = std::unique_ptr<RecScan>(scan);
+        // RmScan *scan = new RmScan(fh_);
+        // scan_ = std::unique_ptr<RecScan>(scan);
         scan_->begin();
         auto rec = scan_.get()->rid();
         nextTuple();
+
+        isend = false;
     }
 
     void nextTuple() override {
@@ -84,15 +90,17 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
 
             if (flag) {
                 rid_ = rec;
+                // scan_->next();
                 return;
             }
             scan_->next();
         }
+        isend = true;
     }
 
     bool is_end() const override {
     
-        return scan_->is_end(); 
+        return scan_->is_end();
         
     }
 

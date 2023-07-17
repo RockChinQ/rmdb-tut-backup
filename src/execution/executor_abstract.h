@@ -26,7 +26,6 @@ class AbstractExecutor {
     virtual size_t tupleLen() const { return 0; };
 
     virtual const std::vector<ColMeta> &cols() const {
-        std::cout<<"abstract cols()"<<std::endl;
         std::vector<ColMeta> *_cols = nullptr;
         return *_cols;
     };
@@ -37,8 +36,7 @@ class AbstractExecutor {
 
     virtual void nextTuple(){};
 
-    virtual bool is_end() const { 
-        std::cout<<"abstract is_end()"<<std::endl;
+    virtual bool is_end() const {
         return true;
     };
 

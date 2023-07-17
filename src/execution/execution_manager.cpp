@@ -130,9 +130,6 @@ void QlManager::run_cmd_utility(std::shared_ptr<Plan> plan, txn_id_t *txn_id, Co
 // 执行select语句，select语句的输出除了需要返回客户端外，还需要写入output.txt文件中
 void QlManager::select_from(std::unique_ptr<AbstractExecutor> executorTreeRoot, std::vector<TabCol> sel_cols, 
                             Context *context) {
-    
-    std::cout<<"select_from start"<<std::endl;
-
     std::vector<std::string> captions;
     captions.reserve(sel_cols.size());
     for (auto &sel_col : sel_cols) {
@@ -156,14 +153,10 @@ void QlManager::select_from(std::unique_ptr<AbstractExecutor> executorTreeRoot, 
     // Print records
     size_t num_rec = 0;
     // 执行query_plan
-    std::cout<<"select_from query plan"<<std::endl;
     for (executorTreeRoot->beginTuple(); !executorTreeRoot->is_end(); executorTreeRoot->nextTuple()) {
         auto Tuple = executorTreeRoot->Next();
 
-        std::cout<<"is Tuple nullptr?"<<(Tuple==nullptr)<<std::endl;
         std::vector<std::string> columns;
-        std::cout<<"treeRoot type "<<executorTreeRoot->getType()<<std::endl;
-        // std::cout<<"is cols nullptr?"<<(executorTreeRoot->cols().empty())<<std::endl;
         for (auto &col : executorTreeRoot->cols()) {
             std::string col_str;
             char *rec_buf = Tuple->data + col.offset;
@@ -177,8 +170,6 @@ void QlManager::select_from(std::unique_ptr<AbstractExecutor> executorTreeRoot, 
             }
             columns.push_back(col_str);
         }
-
-        std::cout<<"select_from inter for loop end"<<std::endl;
         // print record into buffer
         rec_printer.print_record(columns, context);
         // print record into file
