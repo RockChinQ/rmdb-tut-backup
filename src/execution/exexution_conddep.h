@@ -30,11 +30,7 @@ class ConditionDependedExecutor {
     Value get_record_value(const RmRecord &record, const TabCol &col) {
         Value val;
 
-        try{
-        }catch (TableNotFoundError &e){
-        }
-
-        auto col_meta = sm_manager_->db_.get_table(col.tab_name).get_col(col.col_name)[0];
+        auto col_meta = sm_manager_->db_.get_table(tab_name_).get_col(col.col_name)[0];
 
         val.type = col_meta.type;
         
@@ -76,12 +72,15 @@ class ConditionDependedExecutor {
         float cp_res = 0;
 
         if (left.type == TYPE_INT && right.type == TYPE_INT) {
-
+            std::cout<<"left.int_val: "<<left.int_val<<" right.int_val: "<<right.int_val<<std::endl;
             cp_res = left.int_val - right.int_val;
         } else if (left.type == TYPE_FLOAT && right.type == TYPE_FLOAT) {
-
+            std::cout<<"left.float_val: "<<left.float_val<<" right.float_val: "<<right.float_val<<std::endl;
             cp_res = left.float_val - right.float_val;
         } else if (left.type == TYPE_STRING && right.type == TYPE_STRING) {
+
+            std::cout<<"left.str_val: "<<left.str_val<<" right.str_val: "<<right.str_val<<std::endl;
+
             cp_res = left.str_val.compare(right.str_val);
 
         } else {

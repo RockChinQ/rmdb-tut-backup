@@ -63,10 +63,9 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
         // RmScan *scan = new RmScan(fh_);
         // scan_ = std::unique_ptr<RecScan>(scan);
         scan_->begin();
-        // nextTuple();
-        scan_->next();
-        auto rid = scan_.get()->rid();
+        auto rec = scan_.get()->rid();
         nextTuple();
+
         isend = false;
     }
 
@@ -74,7 +73,7 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
         // 先检查此条记录是否满足所有条件
         // 再next下一条
         // 返回的是此条！！！！！！！！！！！！！！！！！
-        // scan_->next();
+        scan_->next();
         while (!scan_->is_end()) {
             auto rec = scan_.get()->rid();
             auto record = fh_->get_record(rec, context_);
@@ -91,7 +90,7 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
 
             if (flag) {
                 rid_ = rec;
-                scan_->next();
+                // scan_->next();
                 return;
             }
             scan_->next();
@@ -101,7 +100,7 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
 
     bool is_end() const override {
     
-        return isend;
+        return scan_->is_end();
         
     }
 
