@@ -131,6 +131,8 @@ struct Value {
     };
     std::string str_val;  // string value
 
+    int64_t bigint_val;   // bigint value
+
     DateTime datetime_val; // datetime value
 
     std::shared_ptr<RmRecord> raw;  // raw record buffer
@@ -148,6 +150,25 @@ struct Value {
     void set_str(std::string str_val_) {
         type = TYPE_STRING;
         str_val = std::move(str_val_);
+    }
+
+    void set_bigint(int int_val_) {
+        type = TYPE_BIGINT;
+        bigint_val = int_val_;
+    }
+
+    void set_bigint(int64_t int_val_) {
+        type = TYPE_BIGINT;
+        bigint_val = int_val_;
+    }
+
+    void set_bigint(const std::string &bigint_val_) {
+        type = TYPE_BIGINT;
+        try {
+            bigint_val = std::stoll(bigint_val_);
+        }catch(std::out_of_range const& ex) {
+            throw TypeOverflowError("BIGINT", bigint_val_);
+        }
     }
 
     // 从uint64_t的形式转化为datetime
@@ -185,7 +206,11 @@ struct Value {
         } else if (type == TYPE_DATETIME) {
             assert(len == sizeof(uint64_t));
             *(uint64_t *)(raw->data) = datetime_val.encode();
-        } else {
+        } else if (type == TYPE_BIGINT) {
+            assert(len == sizeof(int64_t));
+            *(int64_t *)(raw->data) = bigint_val;
+        } 
+        else {
             throw InvalidTypeError();
         }
     }

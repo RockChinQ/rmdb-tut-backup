@@ -34,8 +34,8 @@
 /* Undocumented macros, especially those whose name start with YY_,
    are private implementation details.  Do not rely on them.  */
 
-#ifndef YY_YY_HOME_JHAOC_CPP_RMDB_TUT_SRC_PARSER_YACC_TAB_H_INCLUDED
-# define YY_YY_HOME_JHAOC_CPP_RMDB_TUT_SRC_PARSER_YACC_TAB_H_INCLUDED
+#ifndef YY_YY_YACC_TAB_H_INCLUDED
+# define YY_YY_YACC_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -70,26 +70,28 @@ extern int yydebug;
     INT = 276,
     CHAR = 277,
     FLOAT = 278,
-    DATETIME = 279,
-    INDEX = 280,
-    AND = 281,
-    JOIN = 282,
-    EXIT = 283,
-    HELP = 284,
-    TXN_BEGIN = 285,
-    TXN_COMMIT = 286,
-    TXN_ABORT = 287,
-    TXN_ROLLBACK = 288,
-    ORDER_BY = 289,
-    LEQ = 290,
-    NEQ = 291,
-    GEQ = 292,
-    T_EOF = 293,
-    IDENTIFIER = 294,
-    VALUE_STRING = 295,
-    VALUE_INT = 296,
-    VALUE_FLOAT = 297,
-    VALUE_DATETIME = 298
+    BIGINT = 279,
+    DATETIME = 280,
+    INDEX = 281,
+    AND = 282,
+    JOIN = 283,
+    EXIT = 284,
+    HELP = 285,
+    TXN_BEGIN = 286,
+    TXN_COMMIT = 287,
+    TXN_ABORT = 288,
+    TXN_ROLLBACK = 289,
+    ORDER_BY = 290,
+    LEQ = 291,
+    NEQ = 292,
+    GEQ = 293,
+    T_EOF = 294,
+    IDENTIFIER = 295,
+    VALUE_STRING = 296,
+    VALUE_INT = 297,
+    VALUE_FLOAT = 298,
+    VALUE_BIGINT = 299,
+    VALUE_DATETIME = 300
   };
 #endif
 
@@ -113,4 +115,4 @@ struct YYLTYPE
 
 int yyparse (void);
 
-#endif /* !YY_YY_HOME_JHAOC_CPP_RMDB_TUT_SRC_PARSER_YACC_TAB_H_INCLUDED  */
+#endif /* !YY_YY_YACC_TAB_H_INCLUDED  */

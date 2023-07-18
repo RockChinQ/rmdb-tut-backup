@@ -26,6 +26,12 @@ class ConditionDependedExecutor {
             uint64_t tmp;
             memcpy((char*)&tmp, record.data + offset, len);
             val.set_datetime(tmp);
+        } else if (type == TYPE_BIGINT) {
+            int64_t tmp;
+            memcpy((char*)&tmp, record.data + offset, len);
+            val.set_bigint(tmp); 
+        } else {
+             throw InvalidTypeError();
         }
 
         return val;
@@ -52,7 +58,12 @@ class ConditionDependedExecutor {
             uint64_t tmp;
             memcpy((char*)&tmp, record.data + col_meta.offset, col_meta.len);
             val.set_datetime(tmp);
-        }else {
+        } else if (col_meta.type == TYPE_BIGINT) {
+            int64_t tmp;
+            memcpy((char*)&tmp, record.data + col_meta.offset, col_meta.len);
+            val.set_bigint(tmp);
+        }
+        else {
             throw InvalidTypeError();
         }
 
@@ -78,7 +89,13 @@ class ConditionDependedExecutor {
         } else if (left.type == TYPE_FLOAT && right.type == TYPE_INT) {
             right.set_float(right.int_val);
         }
-
+        // 把int转换为bigint
+        if (left.type == TYPE_INT && right.type == TYPE_BIGINT) {
+            left.set_bigint(left.int_val);
+        } else if (left.type == TYPE_BIGINT && right.type == TYPE_INT) {
+            right.set_bigint(right.int_val);
+        }
+        
         float cp_res = 0;
 
         if (left.type == TYPE_INT && right.type == TYPE_INT) {
@@ -97,7 +114,11 @@ class ConditionDependedExecutor {
             std::cout<<"left.datetime_val: "<<left.datetime_val.encode_to_string()<<" right.datetime_val: "<<right.datetime_val.encode_to_string();
 
             cp_res = left.datetime_val.encode()-right.datetime_val.encode();
-        } else {
+        } else if (left.type == TYPE_BIGINT && right.type == TYPE_BIGINT) {
+            std::cout<<"left.bigint_val: "<<left.bigint_val<<" right.bigint_val: "<<right.bigint_val<<std::endl;
+            cp_res = left.bigint_val - right.bigint_val;
+        }  
+        else {
             throw InternalError("Unexpected value pair field type");
         }
 

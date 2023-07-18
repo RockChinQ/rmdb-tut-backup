@@ -52,7 +52,7 @@ class Planner {
 
     ColType interp_sv_type(ast::SvType sv_type) {
         std::map<ast::SvType, ColType> m = {
-            {ast::SV_TYPE_INT, TYPE_INT}, {ast::SV_TYPE_FLOAT, TYPE_FLOAT}, {ast::SV_TYPE_STRING, TYPE_STRING}, {ast::SV_TYPE_DATETIME, TYPE_DATETIME}};
+            {ast::SV_TYPE_INT, TYPE_INT}, {ast::SV_TYPE_FLOAT, TYPE_FLOAT}, {ast::SV_TYPE_STRING, TYPE_STRING}, {ast::SV_TYPE_DATETIME, TYPE_DATETIME}, {ast::SV_TYPE_BIGINT, TYPE_BIGINT}};
         return m.at(sv_type);
     }
 };

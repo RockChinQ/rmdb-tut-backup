@@ -173,7 +173,10 @@ void QlManager::select_from(std::unique_ptr<AbstractExecutor> executorTreeRoot, 
                 DateTime dt;
                 dt.decode(raw);
                 col_str = dt.encode_to_string();
-            } else {
+            } else if (col.type == TYPE_BIGINT) {
+                col_str = std::to_string(*(int64_t *)rec_buf);
+            } 
+            else {
                 throw InvalidTypeError();
             }
             columns.push_back(col_str);
