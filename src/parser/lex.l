@@ -106,14 +106,15 @@ single_op ";"|"("|")"|","|"*"|"="|">"|"<"|"."
     yylval->sv_float = atof(yytext);
     return VALUE_FLOAT;
 }
-{value_string} {
-    yylval->sv_str = std::string(yytext + 1, strlen(yytext) - 2);
-    return VALUE_STRING;
-}
 
 {value_datetime} {
     yylval->sv_str = std::string(yytext + 1, strlen(yytext) - 2);
     return VALUE_DATETIME;
+}
+
+{value_string} {
+    yylval->sv_str = std::string(yytext + 1, strlen(yytext) - 2);
+    return VALUE_STRING;
 }
 
     /* EOF */

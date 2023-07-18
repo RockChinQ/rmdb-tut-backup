@@ -23,6 +23,11 @@ std::shared_ptr<Query> Analyze::do_analyze(std::shared_ptr<ast::TreeNode> parse)
         // 处理表名
         query->tables = std::move(x->tabs);
         /** TODO: 检查表是否存在 */
+        for (auto &table : query->tables){
+            if(!sm_manager_->db_.is_table(table)){
+                throw TableNotFoundError(table);
+            }    
+        }
 
         // 处理target list，再target list中添加上表名，例如 a.id
         for (auto &sv_sel_col : x->cols) {
@@ -187,6 +192,8 @@ Value Analyze::convert_sv_value(const std::shared_ptr<ast::Value> &sv_val) {
         val.set_float(float_lit->val);
     } else if (auto str_lit = std::dynamic_pointer_cast<ast::StringLit>(sv_val)) {
         val.set_str(str_lit->val);
+    } else if(auto datetime_lit = std::dynamic_pointer_cast<ast::DateTimeLit>(sv_val)) {
+        val.set_datetime(datetime_lit->val);
     } else {
         throw InternalError("Unexpected sv value type");
     }

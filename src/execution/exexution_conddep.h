@@ -22,6 +22,10 @@ class ConditionDependedExecutor {
             val.set_float(*(float *)(record.data + offset));
         } else if (type == TYPE_STRING) {
             val.set_str(std::string(record.data + offset, len));
+        } else if (type == TYPE_DATETIME) {
+            uint64_t tmp;
+            memcpy((char*)&tmp, record.data + offset, len);
+            val.set_datetime(tmp);
         }
 
         return val;
@@ -44,6 +48,12 @@ class ConditionDependedExecutor {
             int len = col_meta.len;
 
             val.set_str(std::string(record.data + offset, len));
+        } else if (col_meta.type == TYPE_DATETIME) {
+            uint64_t tmp;
+            memcpy((char*)&tmp, record.data + col_meta.offset, col_meta.len);
+            val.set_datetime(tmp);
+        }else {
+            throw InvalidTypeError();
         }
 
         // TODO: BIGINT
@@ -83,6 +93,10 @@ class ConditionDependedExecutor {
 
             cp_res = left.str_val.compare(right.str_val);
 
+        } else if (left.type==TYPE_DATETIME && right.type == TYPE_DATETIME) {
+            std::cout<<"left.datetime_val: "<<left.datetime_val.encode_to_string()<<" right.datetime_val: "<<right.datetime_val.encode_to_string();
+
+            cp_res = left.datetime_val.encode()-right.datetime_val.encode();
         } else {
             throw InternalError("Unexpected value pair field type");
         }

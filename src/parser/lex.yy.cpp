@@ -1,6 +1,6 @@
-#line 2 "lex.yy.cpp"
+#line 2 "/home/jhaoc/cpp/rmdb-tut/src/parser/lex.yy.cpp"
 
-#line 4 "lex.yy.cpp"
+#line 4 "/home/jhaoc/cpp/rmdb-tut/src/parser/lex.yy.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -393,7 +393,7 @@ static const flex_int16_t yy_accept[181] =
         0,    0,    0,    0,   50,   48,    6,    7,    7,   48,
        42,   48,   48,   48,   44,   42,   42,   43,   43,   43,
        43,   43,   43,   43,   43,   43,   43,   43,   43,   43,
-       43,   43,   43,   43,    3,    4,    6,    7,    0,   46,
+       43,   43,   43,   43,    3,    4,    6,    7,    0,   47,
         0,   44,    5,    1,   45,   40,   41,   39,   43,   43,
        43,   43,   43,   37,   43,   43,   43,   43,   43,   43,
        43,   43,   43,   43,   43,   43,   43,   43,   43,   43,
@@ -643,9 +643,9 @@ char *yytext;
         } \
     }
 
-#line 647 "lex.yy.cpp"
+#line 647 "/home/jhaoc/cpp/rmdb-tut/src/parser/lex.yy.cpp"
 
-#line 649 "lex.yy.cpp"
+#line 649 "/home/jhaoc/cpp/rmdb-tut/src/parser/lex.yy.cpp"
 
 #define INITIAL 0
 #define STATE_COMMENT 1
@@ -883,7 +883,7 @@ YY_DECL
 
 #line 49 "lex.l"
     /* block comment */
-#line 887 "lex.yy.cpp"
+#line 887 "/home/jhaoc/cpp/rmdb-tut/src/parser/lex.yy.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1183,40 +1183,40 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case 46:
-/* rule 46 can match eol */
 YY_RULE_SETUP
-#line 110 "lex.l"
-{
-    yylval->sv_str = std::string(yytext + 1, strlen(yytext) - 2);
-    return VALUE_STRING;
-}
-	YY_BREAK
-case 47:
-YY_RULE_SETUP
-#line 115 "lex.l"
+#line 111 "lex.l"
 {
     yylval->sv_str = std::string(yytext + 1, strlen(yytext) - 2);
     return VALUE_DATETIME;
 }
 	YY_BREAK
+case 47:
+/* rule 47 can match eol */
+YY_RULE_SETUP
+#line 116 "lex.l"
+{
+    yylval->sv_str = std::string(yytext + 1, strlen(yytext) - 2);
+    return VALUE_STRING;
+}
+	YY_BREAK
 /* EOF */
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STATE_COMMENT):
-#line 121 "lex.l"
+#line 122 "lex.l"
 { return T_EOF; }
 	YY_BREAK
 /* unexpected char */
 case 48:
 YY_RULE_SETUP
-#line 123 "lex.l"
+#line 124 "lex.l"
 { std::cerr << "Lexer Error: unexpected character " << yytext[0] << std::endl; }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 124 "lex.l"
+#line 125 "lex.l"
 ECHO;
 	YY_BREAK
-#line 1220 "lex.yy.cpp"
+#line 1220 "/home/jhaoc/cpp/rmdb-tut/src/parser/lex.yy.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2182,6 +2182,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 124 "lex.l"
+#line 125 "lex.l"
 
 

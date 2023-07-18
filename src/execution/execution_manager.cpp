@@ -167,6 +167,14 @@ void QlManager::select_from(std::unique_ptr<AbstractExecutor> executorTreeRoot, 
             } else if (col.type == TYPE_STRING) {
                 col_str = std::string((char *)rec_buf, col.len);
                 col_str.resize(strlen(col_str.c_str()));
+            } else if(col.type == TYPE_DATETIME) {
+                uint64_t raw;
+                memcpy((char*)&raw, rec_buf, sizeof(raw));
+                DateTime dt;
+                dt.decode(raw);
+                col_str = dt.encode_to_string();
+            } else {
+                throw InvalidTypeError();
             }
             columns.push_back(col_str);
         }

@@ -165,3 +165,16 @@ class PageNotExistError : public RMDBError {
     PageNotExistError(const std::string &table_name, int page_no)
         : RMDBError("Page " + std::to_string(page_no) + " in table " + table_name + "not exits") {}
 };
+
+// type不合法
+class InvalidTypeError : public RMDBError {
+    public:
+    InvalidTypeError() : RMDBError("Invalid Type Error: Cannot convert to record") {}
+};
+
+// 存储的数值溢出
+class TypeOverflowError :public RMDBError {
+    public:
+    TypeOverflowError(const std::string &type, const std::string &bigint_val)
+        : RMDBError(type + " OVERFLOW: " + bigint_val) {}
+};
