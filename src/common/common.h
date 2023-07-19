@@ -171,6 +171,16 @@ struct Value {
         }
     }
 
+    void set_bigint(float float_val_) {
+        type = TYPE_BIGINT;
+        bigint_val = float_val_;
+    }
+
+    void set_string(const std::string &str_val_) {
+        type = TYPE_STRING;
+        str_val = str_val_;
+    }
+
     // 从uint64_t的形式转化为datetime
     void set_datetime(uint64_t datetime) {
         type = TYPE_DATETIME;
@@ -188,7 +198,16 @@ struct Value {
         }
     }
 
+    void set_datetime(const DateTime &datetime) {
+        type = TYPE_DATETIME;
+        datetime_val = datetime;
+        if(!check_datetime(datetime_val)) {
+            throw TypeOverflowError("DateTime", datetime_val.encode_to_string());
+        }
+    }
+
     void init_raw(int len) {
+        std::cout<<"init_raw len: "<<len<<std::endl;
         assert(raw == nullptr);
         raw = std::make_shared<RmRecord>(len);
         if (type == TYPE_INT) {

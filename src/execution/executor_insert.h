@@ -45,11 +45,12 @@ class InsertExecutor : public AbstractExecutor {
         for (size_t i = 0; i < values_.size(); i++) {
             auto &col = tab_.cols[i];
             auto &val = values_[i];
-            if (col.type != val.type) {
+            Value *new_val = insert_compatible(col.type, val);
+            if (new_val==nullptr) {
                 throw IncompatibleTypeError(coltype2str(col.type), coltype2str(val.type));
             }
-            val.init_raw(col.len);
-            memcpy(rec.data + col.offset, val.raw->data, col.len);
+            new_val->init_raw(col.len);
+            memcpy(rec.data + col.offset, new_val->raw->data, col.len);
         }
         // Insert into record file
         rid_ = fh_->insert_record(rec.data, context_);
@@ -68,5 +69,70 @@ class InsertExecutor : public AbstractExecutor {
         }
         return nullptr;
     }
+
+    Value* insert_compatible(ColType targetType, Value sourceValue){
+        // 把source转换成目标类型的Value
+        Value* targetValue = new Value();
+
+        if (targetType==TYPE_INT){
+            if (sourceValue.type==TYPE_INT){
+                targetValue->set_int(sourceValue.int_val);
+                return targetValue;
+            } else if (sourceValue.type==TYPE_FLOAT){
+                targetValue->set_int(sourceValue.float_val);
+                return targetValue;
+            } else if (sourceValue.type==TYPE_BIGINT){
+                targetValue->set_int(sourceValue.bigint_val);
+                return targetValue;
+            } else {
+                return nullptr;
+            }
+        } else if (targetType==TYPE_FLOAT){
+            if (sourceValue.type==TYPE_INT){
+                targetValue->set_float(sourceValue.int_val);
+                return targetValue;
+            } else if (sourceValue.type==TYPE_FLOAT){
+                std::cout<<"sourceValue.float_val: "<<sourceValue.float_val<<std::endl;
+                
+                targetValue->set_float(sourceValue.float_val);
+                return targetValue;
+            } else if (sourceValue.type==TYPE_BIGINT){
+                targetValue->set_float(sourceValue.bigint_val);
+                return targetValue;
+            } else {
+                return nullptr;
+            }
+        } else if (targetType==TYPE_BIGINT){
+            if (sourceValue.type==TYPE_INT){
+                targetValue->set_bigint(sourceValue.int_val);
+                return targetValue;
+            } else if (sourceValue.type==TYPE_FLOAT){
+                targetValue->set_bigint(sourceValue.float_val);
+                return targetValue;
+            } else if (sourceValue.type==TYPE_BIGINT){
+                targetValue->set_bigint(sourceValue.bigint_val);
+                return targetValue;
+            } else {
+                return nullptr;
+            }
+        } else if (targetType==TYPE_STRING){
+            if (sourceValue.type==TYPE_STRING){
+                targetValue->set_string(sourceValue.str_val);
+                return targetValue;
+            } else {
+                return nullptr;
+            }
+        } else if (targetType==TYPE_DATETIME){
+            if (sourceValue.type==TYPE_DATETIME){
+                targetValue->set_datetime(sourceValue.datetime_val);
+                return targetValue;
+            } else {
+                return nullptr;
+            }
+        } else {
+            return nullptr;
+        }
+    }
+
     Rid &rid() override { return rid_; }
 };

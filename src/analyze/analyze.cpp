@@ -228,6 +228,7 @@ void Analyze::check_clause(const std::vector<std::string> &tab_names, std::vecto
             // throw IncompatibleTypeError(coltype2str(lhs_type), coltype2str(rhs_type));
         // }
         if (!comparable(lhs_type, rhs_type)) {
+            std::cout<<"analyze check_clause"<<std::endl;
             throw IncompatibleTypeError(coltype2str(lhs_type), coltype2str(rhs_type));
         }
     }
