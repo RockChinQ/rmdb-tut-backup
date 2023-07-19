@@ -65,24 +65,26 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
                 int offset = col_meta.offset;
                 int len = col_meta.len;
 
-                int rlen = 0;
-                if (val.type == TYPE_INT) {
-                    rlen = sizeof(int);
-                } else if (val.type == TYPE_FLOAT) {
-                    rlen = sizeof(float);
-                } else if (val.type == TYPE_STRING) {
-                    rlen = val.str_val.size();
-                } else if (val.type == TYPE_DATETIME) {
-                    rlen = sizeof(uint64_t);
-                } else if (val.type == TYPE_BIGINT) {
-                    rlen = sizeof(int64_t);
-                } else {
-                    throw InvalidTypeError();
-                }
+                // int rlen = 0;
+                // if (val.type == TYPE_INT) {
+                //     rlen = sizeof(int);
+                // } else if (val.type == TYPE_FLOAT) {
+                //     rlen = sizeof(float);
+                // } else if (val.type == TYPE_STRING) {
+                //     rlen = val.str_val.size();
+                // } else if (val.type == TYPE_DATETIME) {
+                //     rlen = sizeof(uint64_t);
+                // } else if (val.type == TYPE_BIGINT) {
+                //     rlen = sizeof(int64_t);
+                // } else {
+                //     throw InvalidTypeError();
+                // }
 
-                val.init_raw(rlen);
+                Value *new_val = insert_compatible(col_meta.type, val);
 
-                record->set_column_value(offset, len, val.raw->data);
+                new_val->init_raw(col_meta.len);
+
+                record->set_column_value(offset, len, new_val->raw->data);
             }
 
             fh_->update_record(rid, record.get()->data, context_);
