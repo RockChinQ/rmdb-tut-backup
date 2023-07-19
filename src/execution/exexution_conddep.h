@@ -330,8 +330,8 @@ class ConditionDependedExecutor {
                 targetValue->set_int(sourceValue.float_val);
                 return targetValue;
             } else if (sourceValue.type==TYPE_BIGINT){
-                targetValue->set_int(sourceValue.bigint_val);
-                return targetValue;
+                throw TypeOverflowError("INT", std::to_string(sourceValue.bigint_val));
+                return nullptr;
             } else {
                 return nullptr;
             }
