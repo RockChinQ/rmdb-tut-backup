@@ -12,6 +12,7 @@ See the Mulan PSL v2 for more details. */
 #include "execution_defs.h"
 #include "execution_manager.h"
 #include "executor_abstract.h"
+#include "exexution_conddep.h"
 #include "index/ix.h"
 #include "system/sm.h"
 
@@ -71,6 +72,12 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
                     rlen = sizeof(float);
                 } else if (val.type == TYPE_STRING) {
                     rlen = val.str_val.size();
+                } else if (val.type == TYPE_DATETIME) {
+                    rlen = sizeof(uint64_t);
+                } else if (val.type == TYPE_BIGINT) {
+                    rlen = sizeof(int64_t);
+                } else {
+                    throw InvalidTypeError();
                 }
 
                 val.init_raw(rlen);

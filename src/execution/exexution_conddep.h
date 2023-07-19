@@ -84,17 +84,17 @@ class ConditionDependedExecutor {
     bool check_cond(Value left, Value right, Condition cond){
 
         // 把双方的int都转成float
-        if (left.type == TYPE_INT && right.type == TYPE_FLOAT) {
-            left.set_float(left.int_val);
-        } else if (left.type == TYPE_FLOAT && right.type == TYPE_INT) {
-            right.set_float(right.int_val);
-        }
-        // 把int转换为bigint
-        if (left.type == TYPE_INT && right.type == TYPE_BIGINT) {
-            left.set_bigint(left.int_val);
-        } else if (left.type == TYPE_BIGINT && right.type == TYPE_INT) {
-            right.set_bigint(right.int_val);
-        }
+        // if (left.type == TYPE_INT && right.type == TYPE_FLOAT) {
+        //     left.set_float(left.int_val);
+        // } else if (left.type == TYPE_FLOAT && right.type == TYPE_INT) {
+        //     right.set_float(right.int_val);
+        // }
+        // // 把int转换为bigint
+        // if (left.type == TYPE_INT && right.type == TYPE_BIGINT) {
+        //     left.set_bigint(left.int_val);
+        // } else if (left.type == TYPE_BIGINT && right.type == TYPE_INT) {
+        //     right.set_bigint(right.int_val);
+        // }
         
         float cp_res = 0;
 
@@ -117,7 +117,27 @@ class ConditionDependedExecutor {
         } else if (left.type == TYPE_BIGINT && right.type == TYPE_BIGINT) {
             std::cout<<"left.bigint_val: "<<left.bigint_val<<" right.bigint_val: "<<right.bigint_val<<std::endl;
             cp_res = left.bigint_val - right.bigint_val;
-        }  
+        } 
+        // float&int float&bigint int&float int&bigint bigint&float bigint&int
+        else if (left.type == TYPE_INT && right.type == TYPE_FLOAT) {
+            std::cout<<"left.int_val: "<<left.int_val<<" right.float_val: "<<right.float_val<<std::endl;
+            cp_res = left.int_val - right.float_val;
+        } else if (left.type == TYPE_FLOAT && right.type == TYPE_INT) {
+            std::cout<<"left.float_val: "<<left.float_val<<" right.int_val: "<<right.int_val<<std::endl;
+            cp_res = left.float_val - right.int_val;
+        } else if (left.type == TYPE_INT && right.type == TYPE_BIGINT) {
+            std::cout<<"left.int_val: "<<left.int_val<<" right.bigint_val: "<<right.bigint_val<<std::endl;
+            cp_res = left.int_val - right.bigint_val;
+        } else if (left.type == TYPE_BIGINT && right.type == TYPE_INT) {
+            std::cout<<"left.bigint_val: "<<left.bigint_val<<" right.int_val: "<<right.int_val<<std::endl;
+            cp_res = left.bigint_val - right.int_val;
+        } else if (left.type == TYPE_BIGINT && right.type == TYPE_FLOAT) {
+            std::cout<<"left.bigint_val: "<<left.bigint_val<<" right.float_val: "<<right.float_val<<std::endl;
+            cp_res = left.bigint_val - right.float_val;
+        } else if (left.type == TYPE_FLOAT && right.type == TYPE_BIGINT) {
+            std::cout<<"left.float_val: "<<left.float_val<<" right.bigint_val: "<<right.bigint_val<<std::endl;
+            cp_res = left.float_val - right.bigint_val;
+        }
         else {
             throw InternalError("Unexpected value pair field type");
         }
