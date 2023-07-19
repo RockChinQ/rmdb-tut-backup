@@ -96,14 +96,95 @@ class ConditionDependedExecutor {
         //     right.set_bigint(right.int_val);
         // }
         
-        float cp_res = 0;
+        double cp_res = 0;
+
+        // // 数字比较
+        // if ( (left.type == TYPE_INT || left.type == TYPE_BIGINT || left.type == TYPE_FLOAT) && 
+        //     (right.type == TYPE_INT || left.type == TYPE_BIGINT || right.type == TYPE_FLOAT ) ){
+        //     int left_flag = 0; // 负数 -1 正数 1 零 0
+        //     int right_flag = 0;
+
+        //     if (left.type == TYPE_INT){
+        //         if (left.int_val<0){
+        //             left_flag = 1;
+        //         } else if (left.int_val>0){
+        //             left_flag = 2;
+        //         } else {
+        //             left_flag = 0;
+        //         }
+        //     } else if (left.type == TYPE_BIGINT){
+        //         if (left.bigint_val<0){
+        //             left_flag = 1;
+        //         } else if (left.bigint_val>0){
+        //             left_flag = 2;
+        //         } else {
+        //             left_flag = 0;
+        //         }
+        //     } else if (left.type == TYPE_FLOAT){
+        //         if (left.float_val<0){
+        //             left_flag = 1;
+        //         } else if (left.float_val>0){
+        //             left_flag = 2;
+        //         } else {
+        //             left_flag = 0;
+        //         }
+        //     }
+
+        //     if (right.type == TYPE_INT){
+        //         if (right.int_val<0){
+        //             right_flag = 1;
+        //         } else if (right.int_val>0){
+        //             right_flag = 2;
+        //         } else {
+        //             right_flag = 0;
+        //         }
+        //     } else if (right.type == TYPE_BIGINT){
+        //         if (right.bigint_val<0){
+        //             right_flag = 1;
+        //         } else if (right.bigint_val>0){
+        //             right_flag = 2;
+        //         } else {
+        //             right_flag = 0;
+        //         }
+        //     } else if (right.type == TYPE_FLOAT){
+        //         if (right.float_val<0){
+        //             right_flag = 1;
+        //         } else if (right.float_val>0){
+        //             right_flag = 2;
+        //         } else {
+        //             right_flag = 0;
+        //         }
+        //     }
+
+        //     // 根据符号进行预判断
+        //     if (left_flag == 0){
+        //         cp_res = right_flag;
+        //     } else {
+        //         if (left_flag == right_flag){
+
+        //         }
+        //     }
+        // }
 
         if (left.type == TYPE_INT && right.type == TYPE_INT) {
             std::cout<<"left.int_val: "<<left.int_val<<" right.int_val: "<<right.int_val<<std::endl;
-            cp_res = left.int_val - right.int_val;
+            if (left.int_val > right.int_val){
+                cp_res = 1;
+            } else if (left.int_val < right.int_val){
+                cp_res = -1;
+            } else {
+                cp_res = 0;
+            }
         } else if (left.type == TYPE_FLOAT && right.type == TYPE_FLOAT) {
             std::cout<<"left.float_val: "<<left.float_val<<" right.float_val: "<<right.float_val<<std::endl;
-            cp_res = left.float_val - right.float_val;
+            
+            if (left.float_val > right.float_val){
+                cp_res = 1;
+            } else if (left.float_val < right.float_val){
+                cp_res = -1;
+            } else {
+                cp_res = 0;
+            }
         } else if (left.type == TYPE_STRING && right.type == TYPE_STRING) {
 
             std::cout<<"left.str_val: "<<left.str_val<<" right.str_val: "<<right.str_val<<std::endl;
@@ -116,31 +197,81 @@ class ConditionDependedExecutor {
             cp_res = left.datetime_val.encode()-right.datetime_val.encode();
         } else if (left.type == TYPE_BIGINT && right.type == TYPE_BIGINT) {
             std::cout<<"left.bigint_val: "<<left.bigint_val<<" right.bigint_val: "<<right.bigint_val<<std::endl;
-            cp_res = left.bigint_val - right.bigint_val;
+            
+            if (left.bigint_val > right.bigint_val){
+                cp_res = 1;
+            } else if (left.bigint_val < right.bigint_val){
+                cp_res = -1;
+            } else {
+                cp_res = 0;
+            }
         } 
         // float&int float&bigint int&float int&bigint bigint&float bigint&int
         else if (left.type == TYPE_INT && right.type == TYPE_FLOAT) {
             std::cout<<"left.int_val: "<<left.int_val<<" right.float_val: "<<right.float_val<<std::endl;
-            cp_res = left.int_val - right.float_val;
+            
+            if (left.int_val > right.float_val){
+                cp_res = 1;
+            } else if (left.int_val < right.float_val){
+                cp_res = -1;
+            } else {
+                cp_res = 0;
+            }
         } else if (left.type == TYPE_FLOAT && right.type == TYPE_INT) {
             std::cout<<"left.float_val: "<<left.float_val<<" right.int_val: "<<right.int_val<<std::endl;
-            cp_res = left.float_val - right.int_val;
+            if (left.float_val > right.int_val){
+                cp_res = 1;
+            } else if (left.float_val < right.int_val){
+                cp_res = -1;
+            } else {
+                cp_res = 0;
+            }
         } else if (left.type == TYPE_INT && right.type == TYPE_BIGINT) {
             std::cout<<"left.int_val: "<<left.int_val<<" right.bigint_val: "<<right.bigint_val<<std::endl;
-            cp_res = left.int_val - right.bigint_val;
+            
+            if (left.int_val > right.bigint_val){
+                cp_res = 1;
+            } else if (left.int_val < right.bigint_val){
+                cp_res = -1;
+            } else {
+                cp_res = 0;
+            }
         } else if (left.type == TYPE_BIGINT && right.type == TYPE_INT) {
             std::cout<<"left.bigint_val: "<<left.bigint_val<<" right.int_val: "<<right.int_val<<std::endl;
-            cp_res = left.bigint_val - right.int_val;
+            
+            if (left.bigint_val > right.int_val){
+                cp_res = 1;
+            } else if (left.bigint_val < right.int_val){
+                cp_res = -1;
+            } else {
+                cp_res = 0;
+            }
         } else if (left.type == TYPE_BIGINT && right.type == TYPE_FLOAT) {
             std::cout<<"left.bigint_val: "<<left.bigint_val<<" right.float_val: "<<right.float_val<<std::endl;
-            cp_res = left.bigint_val - right.float_val;
+            
+            if (left.bigint_val > right.float_val){
+                cp_res = 1;
+            } else if (left.bigint_val < right.float_val){
+                cp_res = -1;
+            } else {
+                cp_res = 0;
+            }
         } else if (left.type == TYPE_FLOAT && right.type == TYPE_BIGINT) {
             std::cout<<"left.float_val: "<<left.float_val<<" right.bigint_val: "<<right.bigint_val<<std::endl;
-            cp_res = left.float_val - right.bigint_val;
+            
+            if (left.float_val > right.bigint_val){
+                cp_res = 1;
+            } else if (left.float_val < right.bigint_val){
+                cp_res = -1;
+            } else {
+                cp_res = 0;
+            }
         }
         else {
             throw InternalError("Unexpected value pair field type");
         }
+
+        std::cout<<"compare result: "<<cp_res<<std::endl;
 
         switch (cond.op) {
             case OP_EQ:
