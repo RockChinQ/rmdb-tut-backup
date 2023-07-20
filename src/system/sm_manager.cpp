@@ -357,6 +357,37 @@ void SmManager::drop_index(const std::string& tab_name, const std::vector<std::s
  */
 void SmManager::show_index(const std::string& tab_name, Context* context) {
     std::cout<<"show index called"<<std::endl;
+
+    // 检查表名
+    if (!db_.is_table(tab_name)) {
+        throw TableNotFoundError(tab_name);
+    }
+
+    TabMeta &tab = db_.get_table(tab_name);
+
+    std::fstream outfile;
+
+    outfile.open("output.txt", std::ios::out | std::ios::app);
+
+    // for 所有索引
+    for (auto &ix_meta : tab.indexes) {
+        // 打印表名
+        outfile << "| " << tab_name << " ";
+
+        // 是否唯一
+        outfile << "| unique " ; 
+
+        // 打印字段名
+        outfile << "| (";
+        outfile << ix_meta.cols[0].name;
+        for (int i = 1; i < ix_meta.col_num; i++) {
+            outfile << "," << ix_meta.cols[i].name;
+        }
+        outfile << ") |\n";
+        // // 打印索引名
+        // outfile << "| " << ix_manager_->get_index_name(tab_name, ix_meta.cols) << " |\n";
+    }
+    outfile.close();
 }
 
 /**
