@@ -237,6 +237,11 @@ void SmManager::drop_table(const std::string& tab_name, Context* context) {
     if (!db_.is_table(tab_name)) {
         throw TableNotFoundError(tab_name);
     }
+    // 删除索引
+    
+    for (auto it = db_.tabs_[tab_name].indexes.begin(); it != db_.tabs_[tab_name].indexes.end(); it++) {
+        ix_manager_->destroy_index(tab_name, it->cols);
+    }
 
     // 删除表
     fhs_.erase(tab_name);
@@ -245,10 +250,6 @@ void SmManager::drop_table(const std::string& tab_name, Context* context) {
 
     db_.tabs_.erase(tab_name);
 
-    // 删除索引
-    for (auto it = db_.tabs_[tab_name].indexes.begin(); it != db_.tabs_[tab_name].indexes.end(); it++) {
-        ix_manager_->destroy_index(tab_name, it->cols);
-    }
 
     // 删除数据文件
     rm_manager_->destroy_file(tab_name);
