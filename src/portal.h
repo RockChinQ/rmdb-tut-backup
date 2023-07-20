@@ -69,8 +69,11 @@ class Portal
             switch(x->tag) {
                 case T_select:
                 {   
+                    std::cout<<"start select"<<std::endl;
                     std::shared_ptr<ProjectionPlan> p = std::dynamic_pointer_cast<ProjectionPlan>(x->subplan_);
+                    std::cout<<"start select convert_plan_executor"<<std::endl;
                     std::unique_ptr<AbstractExecutor> root= convert_plan_executor(p, context);
+                    std::cout<<"start select convert_plan_executor end"<<std::endl;
                     return std::make_shared<PortalStmt>(PORTAL_ONE_SELECT, std::move(p->sel_cols_), std::move(root), plan);
                 }
                     

@@ -11,6 +11,7 @@ See the Mulan PSL v2 for more details. */
 #pragma once
 
 #include "ix_defs.h"
+#include "common/common.h"
 #include "transaction/transaction.h"
 
 enum class Operation { FIND = 0, INSERT, DELETE };  // 三种操作：查找、插入、删除
@@ -31,7 +32,14 @@ inline int ix_compare(const char *a, const char *b, ColType type, int col_len) {
         }
         case TYPE_STRING:
             return memcmp(a, b, col_len);
-        // TODO(types): add more types
+        case TYPE_BIGINT:
+            int64_t ia = *(int64_t *)a;
+            int64_t ib = *(int64_t *)b;
+            return (ia < ib) ? -1 : ((ia > ib) ? 1 : 0);
+        case TYPE_DATETIME:
+            u_int64_t ia = *(u_int64_t *)a;
+            u_int64_t ib = *(u_int64_t *)b;
+            return (ia < ib) ? -1 : ((ia > ib) ? 1 : 0);
         default:
             throw InternalError("Unexpected data type");
     }
