@@ -508,18 +508,40 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
+<<<<<<< HEAD
 #define YYFINAL  48
 /* YYLAST -- Last index in YYTABLE.  */
+<<<<<<< HEAD
 #define YYLAST   161
+=======
+#define YYLAST   150
+=======
+#define YYFINAL  40
+/* YYLAST -- Last index in YYTABLE.  */
+#define YYLAST   120
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  61
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  35
 /* YYNRULES -- Number of rules.  */
+<<<<<<< HEAD
 #define YYNRULES  86
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  172
+=======
+<<<<<<< HEAD
+#define YYNRULES  83
+/* YYNSTATES -- Number of states.  */
+#define YYNSTATES  167
+=======
+#define YYNRULES  74
+/* YYNSTATES -- Number of states.  */
+#define YYNSTATES  134
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   306
@@ -571,6 +593,7 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
+<<<<<<< HEAD
        0,    63,    63,    68,    73,    78,    86,    87,    88,    89,
       93,    97,   101,   105,   112,   119,   123,   127,   131,   135,
      142,   146,   150,   154,   158,   165,   169,   176,   180,   187,
@@ -580,6 +603,28 @@ static const yytype_int16 yyrline[] =
      343,   350,   357,   361,   365,   370,   375,   379,   383,   390,
      397,   404,   411,   418,   422,   426,   434,   439,   443,   447,
      452,   459,   466,   467,   468,   471,   473
+=======
+<<<<<<< HEAD
+       0,    61,    61,    66,    71,    76,    84,    85,    86,    87,
+      91,    95,    99,   103,   110,   117,   121,   125,   129,   133,
+     140,   144,   148,   152,   156,   163,   167,   174,   178,   185,
+     192,   196,   200,   205,   210,   217,   221,   228,   232,   236,
+     240,   244,   251,   258,   259,   266,   270,   277,   281,   288,
+     292,   299,   303,   307,   311,   315,   319,   326,   330,   337,
+     341,   348,   355,   359,   363,   368,   373,   377,   381,   388,
+     395,   402,   409,   416,   420,   424,   431,   435,   439,   446,
+     447,   448,   451,   453
+=======
+       0,    58,    58,    63,    68,    73,    81,    82,    83,    84,
+      88,    92,    96,   100,   107,   111,   118,   122,   126,   130,
+     134,   141,   145,   149,   153,   160,   164,   171,   175,   182,
+     189,   193,   197,   202,   207,   214,   218,   225,   229,   233,
+     237,   241,   248,   255,   256,   263,   267,   274,   278,   285,
+     289,   296,   300,   304,   308,   312,   316,   323,   327,   334,
+     338,   345,   352,   356,   360,   364,   368,   375,   379,   383,
+     390,   391,   392,   395,   397
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 };
 #endif
 
@@ -621,12 +666,24 @@ static const yytype_int16 yytoknum[] =
 };
 # endif
 
+<<<<<<< HEAD
 #define YYPACT_NINF (-83)
+=======
+#define YYPACT_NINF (-78)
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
+<<<<<<< HEAD
 #define YYTABLE_NINF (-86)
+=======
+<<<<<<< HEAD
+#define YYTABLE_NINF (-83)
+=======
+#define YYTABLE_NINF (-74)
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 
 #define yytable_value_is_error(Yyn) \
   0
@@ -635,6 +692,7 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
+<<<<<<< HEAD
       39,    -1,    11,    12,   -27,    19,    27,   -27,    -7,   -83,
      -83,   -83,   -83,   -83,   -83,   -83,    52,     6,   -83,   -83,
      -83,   -83,   -83,   -27,   -27,   -27,   -27,   -83,   -83,   -27,
@@ -653,6 +711,42 @@ static const yytype_int8 yypact[] =
      -83,   -83,   -83,    80,   -83,   -83,   -83,   -83,   -83,    90,
      -83,    16,     9,   -83,   -83,   -83,   -83,   -83,    99,    80,
      -83,   -83
+=======
+<<<<<<< HEAD
+      39,     1,    11,    13,   -20,    18,    32,   -20,    -7,   -83,
+     -83,   -83,   -83,   -83,   -83,   -83,    36,    16,   -83,   -83,
+     -83,   -83,   -83,   -20,   -20,   -20,   -20,   -83,   -83,   -20,
+     -20,    56,   -83,   -83,   -83,   -83,     3,   -83,   -83,    20,
+      71,    77,    40,    42,    46,    64,    62,   -83,   -83,   -83,
+      66,    67,   -83,    68,    80,   104,    78,    81,   -20,   -20,
+      78,   -16,    78,    78,    78,    78,    78,    78,    70,    81,
+     -83,   -83,    -1,   -83,    69,   -83,   -14,   -83,   104,    74,
+      75,    76,    79,    82,   -83,   -19,   -83,    85,     7,   -83,
+      23,    65,   -83,   103,    22,    78,   -83,    65,   -20,   -20,
+     116,   -83,    97,    98,   100,   101,   102,   -83,    78,   -83,
+      87,   -83,   -83,   -83,   -83,   -83,    78,   -83,   -83,   -83,
+     -83,   -83,   -83,    28,   -83,    81,   -83,   -83,   -83,   -83,
+     -83,   -83,    55,   -83,   -83,   -83,   -83,   124,   -83,    78,
+      78,    78,    78,    78,   -83,    94,   -83,   -83,    65,   -83,
+     -83,   -83,   -83,    81,   -83,   -83,   -83,   -83,   -83,    89,
+     -83,    10,   -83,   -83,   -83,   -83,   -83
+=======
+      42,     7,     0,     4,   -26,    27,    28,   -26,   -25,   -78,
+     -78,   -78,   -78,   -78,   -78,   -78,    40,     6,   -78,   -78,
+     -78,   -78,   -78,    43,   -26,   -26,   -26,   -26,   -78,   -78,
+     -26,   -26,    34,    11,   -78,   -78,    16,    53,    20,   -78,
+     -78,   -78,   -26,    30,    33,   -78,    56,    44,    85,    64,
+      65,   -26,    64,   -78,    64,    64,    64,    59,    65,   -78,
+     -78,    -5,   -78,    57,   -78,     8,   -78,   -78,   -31,   -78,
+      70,   -14,   -78,    10,    55,   -78,    80,    31,    64,   -78,
+      55,   -26,   -26,    94,   -78,    64,   -78,    63,   -78,   -78,
+     -78,   -78,   -78,    64,   -78,   -78,   -78,   -78,   -78,   -78,
+      15,   -78,    65,   -78,   -78,   -78,   -78,   -78,   -78,    45,
+     -78,   -78,   -78,   -78,    95,   -78,   -78,    71,   -78,   -78,
+      55,   -78,   -78,   -78,   -78,    65,    66,   -78,     5,   -78,
+     -78,   -78,   -78,   -78
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -662,8 +756,14 @@ static const yytype_int8 yydefact[] =
 {
        0,     0,     0,     0,     0,     0,     0,     0,     0,     4,
        3,    10,    11,    12,    13,     5,     0,     0,     9,     6,
+<<<<<<< HEAD
        7,     8,    14,     0,     0,     0,     0,    85,    17,     0,
        0,     0,    69,    70,    71,    72,    86,    62,    49,    63,
+=======
+<<<<<<< HEAD
+       7,     8,    14,     0,     0,     0,     0,    82,    17,     0,
+       0,     0,    69,    70,    71,    72,    83,    62,    49,    63,
+>>>>>>> feat: 更改parser的部分以支持index相关操作
        0,     0,     0,     0,     0,     0,     0,    48,     1,     2,
        0,     0,    16,     0,     0,    43,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
@@ -676,26 +776,67 @@ static const yytype_int8 yydefact[] =
       52,    53,     0,    60,    61,    75,    74,     0,    23,     0,
        0,     0,     0,     0,    26,     0,    28,    20,     0,    46,
       57,    58,    42,     0,    64,    68,    67,    66,    65,     0,
+<<<<<<< HEAD
       36,    84,    76,    79,    31,    83,    82,    81,     0,     0,
       77,    80
+=======
+      36,    81,    76,    31,    80,    79,    78
+=======
+       7,     8,    14,     0,     0,     0,     0,     0,    73,    18,
+       0,     0,     0,    74,    62,    49,    63,     0,     0,    48,
+       1,     2,     0,     0,     0,    17,     0,     0,    43,     0,
+       0,     0,     0,    15,     0,     0,     0,     0,     0,    22,
+      74,    43,    59,     0,    50,    43,    64,    47,     0,    25,
+       0,     0,    27,     0,     0,    45,    44,     0,     0,    23,
+       0,     0,     0,    68,    16,     0,    30,     0,    32,    33,
+      34,    29,    19,     0,    20,    39,    37,    38,    40,    41,
+       0,    35,     0,    55,    54,    56,    51,    52,    53,     0,
+      60,    61,    66,    65,     0,    24,    26,     0,    28,    21,
+       0,    46,    57,    58,    42,     0,     0,    36,    72,    67,
+      31,    71,    70,    69
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
+<<<<<<< HEAD
      -83,   -83,   -83,   -83,   -83,   -83,   -83,   -83,    84,    40,
      -83,   -83,   -82,    21,   -11,   -83,    -8,   -83,   -83,   -83,
      -83,    54,   -83,   -83,   -83,   -83,   -83,   -83,   -83,   -83,
      -83,   -17,   -83,    -3,   -54
+=======
+<<<<<<< HEAD
+     -83,   -83,   -83,   -83,   -83,   -83,   -83,   -83,    83,    35,
+     -83,   -83,   -82,    19,    21,   -83,    -8,   -83,   -83,   -83,
+     -83,    51,   -83,   -83,   -83,   -83,   -83,   -83,   -83,   -83,
+     -83,   -83,    -3,   -54
+=======
+     -78,   -78,   -78,   -78,   -78,   -78,   -78,   -78,    60,    35,
+     -78,   -78,   -77,    13,   -45,   -78,    -8,   -78,   -78,   -78,
+     -78,    41,   -78,   -78,   -78,   -78,   -78,    -3,   -47
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
+<<<<<<< HEAD
       -1,    16,    17,    18,    19,    20,    21,    85,    88,    86,
      114,   123,   124,    92,    70,    93,    94,    39,   132,   152,
       72,    73,    40,    41,    42,    43,    44,    45,    76,   138,
+<<<<<<< HEAD
      162,   163,   167,    46,    47
+=======
+     162,   166,    46,    47
+=======
+      -1,    16,    17,    18,    19,    20,    21,    68,    71,    69,
+      91,   100,   101,    75,    59,    76,    77,    36,   109,   124,
+      61,    62,    37,    65,   115,   129,   133,    38,    39
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -703,6 +844,7 @@ static const yytype_int16 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int16 yytable[] =
 {
+<<<<<<< HEAD
       38,    28,    74,    22,    31,    69,    79,    81,    82,    83,
       84,    87,    89,    89,    71,   134,    98,    23,    25,    27,
       50,    51,    52,    53,   165,    69,    54,    55,    80,    29,
@@ -720,10 +862,45 @@ static const yytype_int16 yytable[] =
      145,   143,   153,   159,   164,   161,   149,   170,   144,   133,
        0,    90,   171,     0,     0,     0,     0,     0,     0,     0,
        0,   161
+=======
+<<<<<<< HEAD
+      38,    28,    74,    69,    31,    22,    79,    81,    82,    83,
+      84,    87,    89,    89,    98,   134,    69,    23,   164,    25,
+      50,    51,    52,    53,   165,    27,    54,    55,    29,    71,
+      32,    33,    34,    35,   107,   108,    48,    24,    36,    26,
+      99,    74,     1,    80,     2,    30,     3,     4,     5,    75,
+     150,     6,    37,    95,    87,    77,    78,     7,   -82,     8,
+     115,   116,   146,   126,   127,   128,   160,    49,     9,    10,
+      11,    12,    13,    14,    57,    56,   117,   116,   129,   130,
+     131,   147,   148,    15,    58,   154,   155,   156,   157,   158,
+      59,    68,    60,    96,    61,   135,   136,   100,    62,   101,
+      36,   118,   119,   120,   121,   122,   109,   110,   111,   112,
+     113,   118,   119,   120,   121,   122,    63,    64,    65,    66,
+      67,    69,    91,    71,   151,    97,    36,   102,   103,   104,
+     125,   137,   105,   139,   140,   106,   141,   142,   143,   145,
+     153,   159,   163,   144,   149,   161,   133,     0,     0,     0,
+      90
+=======
+      35,    29,    63,   111,    32,    67,    24,    70,    72,    72,
+      26,    22,    58,   131,    28,    33,    79,    84,    85,   132,
+      83,    43,    44,    45,    46,    58,    25,    47,    48,    34,
+      27,    63,   122,    23,    92,    93,    81,    30,    70,    53,
+      40,    31,    64,   127,    78,     1,   118,     2,    66,     3,
+       4,     5,    41,    49,     6,    57,    42,    82,    94,    93,
+       7,   -73,     8,   119,   120,    50,    51,   103,   104,   105,
+      52,     9,    10,    11,    12,    13,    14,    54,   112,   113,
+      55,    15,   106,   107,   108,    33,    95,    96,    97,    98,
+      99,    86,    87,    88,    89,    90,    95,    96,    97,    98,
+      99,   123,    58,    56,    60,    33,    74,   102,    80,   114,
+     117,   125,     0,   126,   130,   121,    73,   128,     0,   110,
+     116
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 };
 
 static const yytype_int16 yycheck[] =
 {
+<<<<<<< HEAD
        8,     4,    56,     4,     7,    17,    60,    61,    62,    63,
       64,    65,    66,    67,    46,    97,    28,     6,     6,    46,
       23,    24,    25,    26,     8,    17,    29,    30,    60,    10,
@@ -741,6 +918,40 @@ static const yytype_int16 yycheck[] =
       53,    37,    16,    48,    54,   153,   125,    48,   108,    95,
       -1,    67,   169,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
       -1,   169
+=======
+<<<<<<< HEAD
+       8,     4,    56,    17,     7,     4,    60,    61,    62,    63,
+      64,    65,    66,    67,    28,    97,    17,     6,     8,     6,
+      23,    24,    25,    26,    14,    45,    29,    30,    10,    45,
+      37,    38,    39,    40,    53,    54,     0,    26,    45,    26,
+      54,    95,     3,    59,     5,    13,     7,     8,     9,    57,
+     132,    12,    59,    54,   108,    58,    59,    18,    55,    20,
+      53,    54,   116,    41,    42,    43,   148,    51,    29,    30,
+      31,    32,    33,    34,    54,    19,    53,    54,    56,    57,
+      58,    53,    54,    44,    13,   139,   140,   141,   142,   143,
+      13,    11,    52,    72,    52,    98,    99,    76,    52,    78,
+      45,    46,    47,    48,    49,    50,    21,    22,    23,    24,
+      25,    46,    47,    48,    49,    50,    52,    55,    52,    52,
+      52,    17,    52,    45,   132,    56,    45,    53,    53,    53,
+      27,    15,    53,    36,    36,    53,    36,    36,    36,    52,
+      16,    47,    53,   108,   125,   153,    95,    -1,    -1,    -1,
+      67
+=======
+       8,     4,    49,    80,     7,    52,     6,    54,    55,    56,
+       6,     4,    17,     8,    40,    40,    61,    48,    49,    14,
+      65,    24,    25,    26,    27,    17,    26,    30,    31,    54,
+      26,    78,   109,    26,    48,    49,    28,    10,    85,    42,
+       0,    13,    50,   120,    49,     3,    93,     5,    51,     7,
+       8,     9,    46,    19,    12,    11,    13,    49,    48,    49,
+      18,    50,    20,    48,    49,    49,    13,    36,    37,    38,
+      50,    29,    30,    31,    32,    33,    34,    47,    81,    82,
+      47,    39,    51,    52,    53,    40,    41,    42,    43,    44,
+      45,    21,    22,    23,    24,    25,    41,    42,    43,    44,
+      45,   109,    17,    47,    40,    40,    47,    27,    51,    15,
+      47,    16,    -1,    42,    48,   102,    56,   125,    -1,    78,
+      85
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -748,6 +959,7 @@ static const yytype_int16 yycheck[] =
 static const yytype_int8 yystos[] =
 {
        0,     3,     5,     7,     8,     9,    12,    18,    20,    29,
+<<<<<<< HEAD
       30,    31,    32,    33,    34,    45,    62,    63,    64,    65,
       66,    67,     4,     6,    26,     6,    26,    46,    94,    10,
       13,    94,    38,    39,    40,    41,    46,    60,    77,    78,
@@ -765,11 +977,46 @@ static const yytype_int8 yystos[] =
       73,    77,    80,    16,    95,    95,    95,    95,    95,    48,
       73,    77,    91,    92,    54,     8,    14,    93,    36,    55,
       48,    92
+=======
+<<<<<<< HEAD
+      30,    31,    32,    33,    34,    44,    61,    62,    63,    64,
+      65,    66,     4,     6,    26,     6,    26,    45,    92,    10,
+      13,    92,    37,    38,    39,    40,    45,    59,    76,    77,
+      82,    83,    84,    85,    86,    87,    92,    93,     0,    51,
+      92,    92,    92,    92,    92,    92,    19,    54,    13,    13,
+      52,    52,    52,    52,    55,    52,    52,    52,    11,    17,
+      74,    45,    80,    81,    93,    76,    88,    92,    92,    93,
+      59,    93,    93,    93,    93,    67,    69,    93,    68,    93,
+      68,    52,    73,    75,    76,    54,    74,    56,    28,    54,
+      74,    74,    53,    53,    53,    53,    53,    53,    54,    21,
+      22,    23,    24,    25,    70,    53,    54,    53,    46,    47,
+      48,    49,    50,    71,    72,    27,    41,    42,    43,    56,
+      57,    58,    78,    81,    72,    92,    92,    15,    89,    36,
+      36,    36,    36,    36,    69,    52,    93,    53,    54,    73,
+      72,    76,    79,    16,    93,    93,    93,    93,    93,    47,
+      72,    76,    90,    53,     8,    14,    91
+=======
+      30,    31,    32,    33,    34,    39,    56,    57,    58,    59,
+      60,    61,     4,    26,     6,    26,     6,    26,    40,    82,
+      10,    13,    82,    40,    54,    71,    72,    77,    82,    83,
+       0,    46,    13,    82,    82,    82,    82,    82,    82,    19,
+      49,    13,    50,    82,    47,    47,    47,    11,    17,    69,
+      40,    75,    76,    83,    71,    78,    82,    83,    62,    64,
+      83,    63,    83,    63,    47,    68,    70,    71,    49,    69,
+      51,    28,    49,    69,    48,    49,    21,    22,    23,    24,
+      25,    65,    48,    49,    48,    41,    42,    43,    44,    45,
+      66,    67,    27,    36,    37,    38,    51,    52,    53,    73,
+      76,    67,    82,    82,    15,    79,    64,    47,    83,    48,
+      49,    68,    67,    71,    74,    16,    42,    67,    71,    80,
+      48,     8,    14,    81
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
+<<<<<<< HEAD
        0,    61,    62,    62,    62,    62,    63,    63,    63,    63,
       64,    64,    64,    64,    65,    66,    66,    66,    66,    66,
       67,    67,    67,    67,    67,    68,    68,    69,    69,    70,
@@ -779,20 +1026,57 @@ static const yytype_int8 yyr1[] =
       81,    82,    83,    83,    84,    84,    84,    84,    84,    85,
       86,    87,    88,    89,    89,    89,    90,    90,    90,    91,
       91,    92,    93,    93,    93,    94,    95
+=======
+<<<<<<< HEAD
+       0,    60,    61,    61,    61,    61,    62,    62,    62,    62,
+      63,    63,    63,    63,    64,    65,    65,    65,    65,    65,
+      66,    66,    66,    66,    66,    67,    67,    68,    68,    69,
+      70,    70,    70,    70,    70,    71,    71,    72,    72,    72,
+      72,    72,    73,    74,    74,    75,    75,    76,    76,    77,
+      77,    78,    78,    78,    78,    78,    78,    79,    79,    80,
+      80,    81,    82,    82,    83,    83,    83,    83,    83,    84,
+      85,    86,    87,    88,    88,    88,    89,    89,    90,    91,
+      91,    91,    92,    93
+=======
+       0,    55,    56,    56,    56,    56,    57,    57,    57,    57,
+      58,    58,    58,    58,    59,    59,    60,    60,    60,    60,
+      60,    61,    61,    61,    61,    62,    62,    63,    63,    64,
+      65,    65,    65,    65,    65,    66,    66,    67,    67,    67,
+      67,    67,    68,    69,    69,    70,    70,    71,    71,    72,
+      72,    73,    73,    73,    73,    73,    73,    74,    74,    75,
+      75,    76,    77,    77,    78,    78,    78,    79,    79,    80,
+      81,    81,    81,    82,    83
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     2,     1,     1,     1,     1,     1,     1,     1,
+<<<<<<< HEAD
        1,     1,     1,     1,     2,     6,     3,     2,     6,     6,
        7,     4,     5,     6,     5,     1,     3,     1,     3,     2,
        1,     4,     1,     1,     1,     1,     3,     1,     1,     1,
        1,     1,     3,     0,     2,     1,     3,     3,     1,     1,
        3,     1,     1,     1,     1,     1,     1,     1,     1,     1,
        3,     3,     1,     1,     6,     6,     6,     6,     6,     1,
+<<<<<<< HEAD
        1,     1,     1,     1,     3,     3,     3,     5,     0,     1,
        3,     2,     1,     1,     0,     1,     1
+=======
+       1,     1,     1,     1,     3,     3,     3,     0,     2,     1,
+       1,     0,     1,     1
+=======
+       1,     1,     1,     1,     2,     4,     6,     3,     2,     6,
+       6,     7,     4,     5,     6,     1,     3,     1,     3,     2,
+       1,     4,     1,     1,     1,     1,     3,     1,     1,     1,
+       1,     1,     3,     0,     2,     1,     3,     3,     1,     1,
+       3,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       3,     3,     1,     1,     1,     3,     3,     3,     0,     2,
+       1,     1,     0,     1,     1
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 };
 
 
@@ -1594,7 +1878,15 @@ yyreduce:
         parse_tree = (yyvsp[-1].sv_node);
         YYACCEPT;
     }
+<<<<<<< HEAD
 #line 1598 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1590 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1564 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 3:
@@ -1603,7 +1895,15 @@ yyreduce:
         parse_tree = std::make_shared<Help>();
         YYACCEPT;
     }
+<<<<<<< HEAD
 #line 1607 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1599 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1573 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 4:
@@ -1612,7 +1912,15 @@ yyreduce:
         parse_tree = nullptr;
         YYACCEPT;
     }
+<<<<<<< HEAD
 #line 1616 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1608 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1582 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 5:
@@ -1621,7 +1929,15 @@ yyreduce:
         parse_tree = nullptr;
         YYACCEPT;
     }
+<<<<<<< HEAD
 #line 1625 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1617 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1591 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 10:
@@ -1629,7 +1945,15 @@ yyreduce:
     {
         (yyval.sv_node) = std::make_shared<TxnBegin>();
     }
+<<<<<<< HEAD
 #line 1633 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1625 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1599 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 11:
@@ -1637,7 +1961,15 @@ yyreduce:
     {
         (yyval.sv_node) = std::make_shared<TxnCommit>();
     }
+<<<<<<< HEAD
 #line 1641 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1633 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1607 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 12:
@@ -1645,7 +1977,15 @@ yyreduce:
     {
         (yyval.sv_node) = std::make_shared<TxnAbort>();
     }
+<<<<<<< HEAD
 #line 1649 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1641 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1615 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 13:
@@ -1653,7 +1993,15 @@ yyreduce:
     {
         (yyval.sv_node) = std::make_shared<TxnRollback>();
     }
+<<<<<<< HEAD
 #line 1657 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1649 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1623 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 14:
@@ -1661,79 +2009,174 @@ yyreduce:
     {
         (yyval.sv_node) = std::make_shared<ShowTables>();
     }
+<<<<<<< HEAD
 #line 1665 "yacc.tab.cpp"
     break;
 
   case 15:
 #line 120 "yacc.y"
+=======
+<<<<<<< HEAD
+#line 1657 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+    break;
+
+  case 15:
+#line 118 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 1631 "yacc.tab.cpp"
+    break;
+
+  case 15:
+#line 112 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_node) = std::make_shared<CreateTable>((yyvsp[-3].sv_str), (yyvsp[-1].sv_fields));
+        (yyval.sv_node) = std::make_shared<ShowIndex>((yyvsp[0].sv_str));
     }
+<<<<<<< HEAD
 #line 1673 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1665 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1639 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 16:
 #line 124 "yacc.y"
     {
-        (yyval.sv_node) = std::make_shared<DropTable>((yyvsp[0].sv_str));
+        (yyval.sv_node) = std::make_shared<CreateTable>((yyvsp[-3].sv_str), (yyvsp[-1].sv_fields));
     }
+<<<<<<< HEAD
 #line 1681 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1673 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1647 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 17:
 #line 128 "yacc.y"
     {
-        (yyval.sv_node) = std::make_shared<DescTable>((yyvsp[0].sv_str));
+        (yyval.sv_node) = std::make_shared<DropTable>((yyvsp[0].sv_str));
     }
+<<<<<<< HEAD
 #line 1689 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1681 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1655 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 18:
 #line 132 "yacc.y"
     {
-        (yyval.sv_node) = std::make_shared<CreateIndex>((yyvsp[-3].sv_str), (yyvsp[-1].sv_strs));
+        (yyval.sv_node) = std::make_shared<DescTable>((yyvsp[0].sv_str));
     }
+<<<<<<< HEAD
 #line 1697 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1689 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1663 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 19:
 #line 136 "yacc.y"
     {
-        (yyval.sv_node) = std::make_shared<DropIndex>((yyvsp[-3].sv_str), (yyvsp[-1].sv_strs));
+        (yyval.sv_node) = std::make_shared<CreateIndex>((yyvsp[-3].sv_str), (yyvsp[-1].sv_strs));
     }
+<<<<<<< HEAD
 #line 1705 "yacc.tab.cpp"
     break;
 
   case 20:
 #line 143 "yacc.y"
+=======
+<<<<<<< HEAD
+#line 1697 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+    break;
+
+  case 20:
+#line 141 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 1671 "yacc.tab.cpp"
+    break;
+
+  case 20:
+#line 135 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_node) = std::make_shared<InsertStmt>((yyvsp[-4].sv_str), (yyvsp[-1].sv_vals));
+        (yyval.sv_node) = std::make_shared<DropIndex>((yyvsp[-3].sv_str), (yyvsp[-1].sv_strs));
     }
+<<<<<<< HEAD
 #line 1713 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1705 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1679 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 21:
 #line 147 "yacc.y"
     {
-        (yyval.sv_node) = std::make_shared<DeleteStmt>((yyvsp[-1].sv_str), (yyvsp[0].sv_conds));
+        (yyval.sv_node) = std::make_shared<InsertStmt>((yyvsp[-4].sv_str), (yyvsp[-1].sv_vals));
     }
+<<<<<<< HEAD
 #line 1721 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1713 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1687 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 22:
 #line 151 "yacc.y"
     {
-        (yyval.sv_node) = std::make_shared<UpdateStmt>((yyvsp[-3].sv_str), (yyvsp[-1].sv_set_clauses), (yyvsp[0].sv_conds));
+        (yyval.sv_node) = std::make_shared<DeleteStmt>((yyvsp[-1].sv_str), (yyvsp[0].sv_conds));
     }
+<<<<<<< HEAD
 #line 1729 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1721 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1695 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 23:
 #line 155 "yacc.y"
     {
+<<<<<<< HEAD
         (yyval.sv_node) = std::make_shared<SelectStmt>((yyvsp[-4].sv_cols), (yyvsp[-2].sv_strs), (yyvsp[-1].sv_conds), (yyvsp[0].op_sv_orderbys));
     }
 #line 1737 "yacc.tab.cpp"
+=======
+        (yyval.sv_node) = std::make_shared<UpdateStmt>((yyvsp[-3].sv_str), (yyvsp[-1].sv_set_clauses), (yyvsp[0].sv_conds));
+    }
+<<<<<<< HEAD
+#line 1729 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 24:
@@ -1741,7 +2184,22 @@ yyreduce:
     {
         (yyval.sv_node) = std::make_shared<AggreStmt>((yyvsp[-3].sv_aggre_col), (yyvsp[-1].sv_str), (yyvsp[0].sv_conds));
     }
+<<<<<<< HEAD
 #line 1745 "yacc.tab.cpp"
+=======
+#line 1737 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1703 "yacc.tab.cpp"
+    break;
+
+  case 24:
+#line 154 "yacc.y"
+    {
+        (yyval.sv_node) = std::make_shared<SelectStmt>((yyvsp[-4].sv_cols), (yyvsp[-2].sv_strs), (yyvsp[-1].sv_conds), (yyvsp[0].sv_orderby));
+    }
+#line 1711 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 25:
@@ -1749,7 +2207,12 @@ yyreduce:
     {
         (yyval.sv_fields) = std::vector<std::shared_ptr<Field>>{(yyvsp[0].sv_field)};
     }
+<<<<<<< HEAD
 #line 1753 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1745 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 26:
@@ -1757,7 +2220,22 @@ yyreduce:
     {
         (yyval.sv_fields).push_back((yyvsp[0].sv_field));
     }
+<<<<<<< HEAD
 #line 1761 "yacc.tab.cpp"
+=======
+#line 1753 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1719 "yacc.tab.cpp"
+    break;
+
+  case 26:
+#line 165 "yacc.y"
+    {
+        (yyval.sv_fields).push_back((yyvsp[0].sv_field));
+    }
+#line 1727 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 27:
@@ -1765,7 +2243,12 @@ yyreduce:
     {
         (yyval.sv_strs) = std::vector<std::string>{(yyvsp[0].sv_str)};
     }
+<<<<<<< HEAD
 #line 1769 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1761 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 28:
@@ -1781,7 +2264,30 @@ yyreduce:
     {
         (yyval.sv_field) = std::make_shared<ColDef>((yyvsp[-1].sv_str), (yyvsp[0].sv_type_len));
     }
+<<<<<<< HEAD
 #line 1785 "yacc.tab.cpp"
+=======
+#line 1777 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1735 "yacc.tab.cpp"
+    break;
+
+  case 28:
+#line 176 "yacc.y"
+    {
+        (yyval.sv_strs).push_back((yyvsp[0].sv_str));
+    }
+#line 1743 "yacc.tab.cpp"
+    break;
+
+  case 29:
+#line 183 "yacc.y"
+    {
+        (yyval.sv_field) = std::make_shared<ColDef>((yyvsp[-1].sv_str), (yyvsp[0].sv_type_len));
+    }
+#line 1751 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 30:
@@ -1789,7 +2295,15 @@ yyreduce:
     {
         (yyval.sv_type_len) = std::make_shared<TypeLen>(SV_TYPE_INT, sizeof(int));
     }
+<<<<<<< HEAD
 #line 1793 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1785 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1759 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 31:
@@ -1797,7 +2311,12 @@ yyreduce:
     {
         (yyval.sv_type_len) = std::make_shared<TypeLen>(SV_TYPE_STRING, (yyvsp[-1].sv_int));
     }
+<<<<<<< HEAD
 #line 1801 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1793 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 32:
@@ -1821,7 +2340,38 @@ yyreduce:
     {
         (yyval.sv_type_len) = std::make_shared<TypeLen>(SV_TYPE_DATETIME, sizeof(uint64_t));
     }
+<<<<<<< HEAD
 #line 1825 "yacc.tab.cpp"
+=======
+#line 1817 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1767 "yacc.tab.cpp"
+    break;
+
+  case 32:
+#line 198 "yacc.y"
+    {
+        (yyval.sv_type_len) = std::make_shared<TypeLen>(SV_TYPE_FLOAT, sizeof(float));
+    }
+#line 1775 "yacc.tab.cpp"
+    break;
+
+  case 33:
+#line 203 "yacc.y"
+    {
+        (yyval.sv_type_len) = std::make_shared<TypeLen>(SV_TYPE_BIGINT, sizeof(int64_t));
+    }
+#line 1783 "yacc.tab.cpp"
+    break;
+
+  case 34:
+#line 208 "yacc.y"
+    {
+        (yyval.sv_type_len) = std::make_shared<TypeLen>(SV_TYPE_DATETIME, sizeof(uint64_t));
+    }
+#line 1791 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 35:
@@ -1829,7 +2379,12 @@ yyreduce:
     {
         (yyval.sv_vals) = std::vector<std::shared_ptr<Value>>{(yyvsp[0].sv_val)};
     }
+<<<<<<< HEAD
 #line 1833 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1825 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 36:
@@ -1837,7 +2392,22 @@ yyreduce:
     {
         (yyval.sv_vals).push_back((yyvsp[0].sv_val));
     }
+<<<<<<< HEAD
 #line 1841 "yacc.tab.cpp"
+=======
+#line 1833 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1799 "yacc.tab.cpp"
+    break;
+
+  case 36:
+#line 219 "yacc.y"
+    {
+        (yyval.sv_vals).push_back((yyvsp[0].sv_val));
+    }
+#line 1807 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 37:
@@ -1845,7 +2415,15 @@ yyreduce:
     {
         (yyval.sv_val) = std::make_shared<IntLit>((yyvsp[0].sv_int));
     }
+<<<<<<< HEAD
 #line 1849 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1841 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1815 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 38:
@@ -1853,7 +2431,15 @@ yyreduce:
     {
         (yyval.sv_val) = std::make_shared<FloatLit>((yyvsp[0].sv_float));
     }
+<<<<<<< HEAD
 #line 1857 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1849 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1823 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 39:
@@ -1861,7 +2447,15 @@ yyreduce:
     {
         (yyval.sv_val) = std::make_shared<StringLit>((yyvsp[0].sv_str));
     }
+<<<<<<< HEAD
 #line 1865 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1857 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1831 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 40:
@@ -1869,7 +2463,12 @@ yyreduce:
     {
         (yyval.sv_val) = std::make_shared<BigIntLit>((yyvsp[0].sv_str));
     }
+<<<<<<< HEAD
 #line 1873 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1865 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 41:
@@ -1903,147 +2502,377 @@ yyreduce:
     break;
 
   case 45:
+<<<<<<< HEAD
 #line 269 "yacc.y"
+=======
+#line 267 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 1839 "yacc.tab.cpp"
+    break;
+
+  case 41:
+#line 242 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_conds) = std::vector<std::shared_ptr<BinaryExpr>>{(yyvsp[0].sv_cond)};
+        (yyval.sv_val) = std::make_shared<DateTimeLit>((yyvsp[0].sv_str));
     }
+#line 1847 "yacc.tab.cpp"
+    break;
+
+  case 42:
+#line 249 "yacc.y"
+    {
+        (yyval.sv_cond) = std::make_shared<BinaryExpr>((yyvsp[-2].sv_col), (yyvsp[-1].sv_comp_op), (yyvsp[0].sv_expr));
+    }
+#line 1855 "yacc.tab.cpp"
+    break;
+
+  case 43:
+#line 255 "yacc.y"
+                      { /* ignore*/ }
+#line 1861 "yacc.tab.cpp"
+    break;
+
+  case 44:
+#line 257 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+    {
+        (yyval.sv_conds) = (yyvsp[0].sv_conds);
+    }
+<<<<<<< HEAD
 #line 1911 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1903 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1869 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 46:
 #line 273 "yacc.y"
     {
-        (yyval.sv_conds).push_back((yyvsp[0].sv_cond));
+        (yyval.sv_conds) = std::vector<std::shared_ptr<BinaryExpr>>{(yyvsp[0].sv_cond)};
     }
+<<<<<<< HEAD
 #line 1919 "yacc.tab.cpp"
     break;
 
   case 47:
 #line 280 "yacc.y"
+=======
+<<<<<<< HEAD
+#line 1911 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+    break;
+
+  case 47:
+#line 278 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 1877 "yacc.tab.cpp"
+    break;
+
+  case 46:
+#line 268 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_col) = std::make_shared<Col>((yyvsp[-2].sv_str), (yyvsp[0].sv_str));
+        (yyval.sv_conds).push_back((yyvsp[0].sv_cond));
     }
+<<<<<<< HEAD
 #line 1927 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1919 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1885 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 48:
 #line 284 "yacc.y"
     {
-        (yyval.sv_col) = std::make_shared<Col>("", (yyvsp[0].sv_str));
+        (yyval.sv_col) = std::make_shared<Col>((yyvsp[-2].sv_str), (yyvsp[0].sv_str));
     }
+<<<<<<< HEAD
 #line 1935 "yacc.tab.cpp"
     break;
 
   case 49:
 #line 291 "yacc.y"
+=======
+<<<<<<< HEAD
+#line 1927 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+    break;
+
+  case 49:
+#line 289 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 1893 "yacc.tab.cpp"
+    break;
+
+  case 48:
+#line 279 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_cols) = std::vector<std::shared_ptr<Col>>{(yyvsp[0].sv_col)};
+        (yyval.sv_col) = std::make_shared<Col>("", (yyvsp[0].sv_str));
     }
+<<<<<<< HEAD
 #line 1943 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1935 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1901 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 50:
 #line 295 "yacc.y"
     {
-        (yyval.sv_cols).push_back((yyvsp[0].sv_col));
+        (yyval.sv_cols) = std::vector<std::shared_ptr<Col>>{(yyvsp[0].sv_col)};
     }
+<<<<<<< HEAD
 #line 1951 "yacc.tab.cpp"
     break;
 
   case 51:
 #line 302 "yacc.y"
+=======
+<<<<<<< HEAD
+#line 1943 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+    break;
+
+  case 51:
+#line 300 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 1909 "yacc.tab.cpp"
+    break;
+
+  case 50:
+#line 290 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_comp_op) = SV_OP_EQ;
+        (yyval.sv_cols).push_back((yyvsp[0].sv_col));
     }
+<<<<<<< HEAD
 #line 1959 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1951 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1917 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 52:
 #line 306 "yacc.y"
     {
-        (yyval.sv_comp_op) = SV_OP_LT;
+        (yyval.sv_comp_op) = SV_OP_EQ;
     }
+<<<<<<< HEAD
 #line 1967 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1959 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1925 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 53:
 #line 310 "yacc.y"
     {
-        (yyval.sv_comp_op) = SV_OP_GT;
+        (yyval.sv_comp_op) = SV_OP_LT;
     }
+<<<<<<< HEAD
 #line 1975 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1967 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1933 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 54:
 #line 314 "yacc.y"
     {
-        (yyval.sv_comp_op) = SV_OP_NE;
+        (yyval.sv_comp_op) = SV_OP_GT;
     }
+<<<<<<< HEAD
 #line 1983 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1975 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1941 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 55:
 #line 318 "yacc.y"
     {
-        (yyval.sv_comp_op) = SV_OP_LE;
+        (yyval.sv_comp_op) = SV_OP_NE;
     }
+<<<<<<< HEAD
 #line 1991 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1983 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1949 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 56:
 #line 322 "yacc.y"
     {
-        (yyval.sv_comp_op) = SV_OP_GE;
+        (yyval.sv_comp_op) = SV_OP_LE;
     }
+<<<<<<< HEAD
 #line 1999 "yacc.tab.cpp"
     break;
 
   case 57:
 #line 329 "yacc.y"
+=======
+<<<<<<< HEAD
+#line 1991 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+    break;
+
+  case 57:
+#line 327 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 1957 "yacc.tab.cpp"
+    break;
+
+  case 56:
+#line 317 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_expr) = std::static_pointer_cast<Expr>((yyvsp[0].sv_val));
+        (yyval.sv_comp_op) = SV_OP_GE;
     }
+<<<<<<< HEAD
 #line 2007 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 1999 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1965 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 58:
 #line 333 "yacc.y"
     {
-        (yyval.sv_expr) = std::static_pointer_cast<Expr>((yyvsp[0].sv_col));
+        (yyval.sv_expr) = std::static_pointer_cast<Expr>((yyvsp[0].sv_val));
     }
+<<<<<<< HEAD
 #line 2015 "yacc.tab.cpp"
     break;
 
   case 59:
 #line 340 "yacc.y"
+=======
+<<<<<<< HEAD
+#line 2007 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+    break;
+
+  case 59:
+#line 338 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 1973 "yacc.tab.cpp"
+    break;
+
+  case 58:
+#line 328 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_set_clauses) = std::vector<std::shared_ptr<SetClause>>{(yyvsp[0].sv_set_clause)};
+        (yyval.sv_expr) = std::static_pointer_cast<Expr>((yyvsp[0].sv_col));
     }
+<<<<<<< HEAD
 #line 2023 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 2015 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 1981 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 60:
 #line 344 "yacc.y"
     {
-        (yyval.sv_set_clauses).push_back((yyvsp[0].sv_set_clause));
+        (yyval.sv_set_clauses) = std::vector<std::shared_ptr<SetClause>>{(yyvsp[0].sv_set_clause)};
     }
+<<<<<<< HEAD
 #line 2031 "yacc.tab.cpp"
     break;
 
   case 61:
 #line 351 "yacc.y"
+=======
+<<<<<<< HEAD
+#line 2023 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+    break;
+
+  case 61:
+#line 349 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 1989 "yacc.tab.cpp"
+    break;
+
+  case 60:
+#line 339 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_set_clause) = std::make_shared<SetClause>((yyvsp[-2].sv_str), (yyvsp[0].sv_val));
+        (yyval.sv_set_clauses).push_back((yyvsp[0].sv_set_clause));
     }
+<<<<<<< HEAD
 #line 2039 "yacc.tab.cpp"
     break;
 
   case 62:
 #line 358 "yacc.y"
+=======
+<<<<<<< HEAD
+#line 2031 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+    break;
+
+  case 62:
+#line 356 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 1997 "yacc.tab.cpp"
+    break;
+
+  case 61:
+#line 346 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_cols) = {};
+        (yyval.sv_set_clause) = std::make_shared<SetClause>((yyvsp[-2].sv_str), (yyvsp[0].sv_val));
     }
+<<<<<<< HEAD
 #line 2047 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 2039 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 64:
@@ -2119,19 +2948,46 @@ yyreduce:
     break;
 
   case 73:
+<<<<<<< HEAD
 #line 419 "yacc.y"
+=======
+#line 417 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 2005 "yacc.tab.cpp"
+    break;
+
+  case 62:
+#line 353 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     {
-        (yyval.sv_strs) = std::vector<std::string>{(yyvsp[0].sv_str)};
+        (yyval.sv_cols) = {};
     }
+<<<<<<< HEAD
 #line 2127 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 2119 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 2013 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 74:
 #line 423 "yacc.y"
     {
-        (yyval.sv_strs).push_back((yyvsp[0].sv_str));
+        (yyval.sv_strs) = std::vector<std::string>{(yyvsp[0].sv_str)};
     }
+<<<<<<< HEAD
 #line 2135 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 2127 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 2021 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 75:
@@ -2139,7 +2995,12 @@ yyreduce:
     {
         (yyval.sv_strs).push_back((yyvsp[0].sv_str));
     }
+<<<<<<< HEAD
 #line 2143 "yacc.tab.cpp"
+=======
+<<<<<<< HEAD
+#line 2135 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
     break;
 
   case 76:
@@ -2207,7 +3068,66 @@ yyreduce:
     break;
 
 
+<<<<<<< HEAD
 #line 2211 "yacc.tab.cpp"
+=======
+#line 2179 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.tab.cpp"
+=======
+#line 2029 "yacc.tab.cpp"
+    break;
+
+  case 66:
+#line 369 "yacc.y"
+    {
+        (yyval.sv_strs).push_back((yyvsp[0].sv_str));
+    }
+#line 2037 "yacc.tab.cpp"
+    break;
+
+  case 67:
+#line 376 "yacc.y"
+    { 
+        (yyval.sv_orderby) = (yyvsp[0].sv_orderby); 
+    }
+#line 2045 "yacc.tab.cpp"
+    break;
+
+  case 68:
+#line 379 "yacc.y"
+                      { /* ignore*/ }
+#line 2051 "yacc.tab.cpp"
+    break;
+
+  case 69:
+#line 384 "yacc.y"
+    { 
+        (yyval.sv_orderby) = std::make_shared<OrderBy>((yyvsp[-1].sv_col), (yyvsp[0].sv_orderby_dir));
+    }
+#line 2059 "yacc.tab.cpp"
+    break;
+
+  case 70:
+#line 390 "yacc.y"
+                 { (yyval.sv_orderby_dir) = OrderBy_ASC;     }
+#line 2065 "yacc.tab.cpp"
+    break;
+
+  case 71:
+#line 391 "yacc.y"
+                 { (yyval.sv_orderby_dir) = OrderBy_DESC;    }
+#line 2071 "yacc.tab.cpp"
+    break;
+
+  case 72:
+#line 392 "yacc.y"
+            { (yyval.sv_orderby_dir) = OrderBy_DEFAULT; }
+#line 2077 "yacc.tab.cpp"
+    break;
+
+
+#line 2081 "yacc.tab.cpp"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 
       default: break;
     }
@@ -2445,5 +3365,13 @@ yyreturn:
 #endif
   return yyresult;
 }
+<<<<<<< HEAD
 #line 474 "yacc.y"
+=======
+<<<<<<< HEAD
+#line 454 "/home/jhaoc/cpp/rmdb-tut/src/parser/yacc.y"
+=======
+#line 398 "yacc.y"
+>>>>>>> feat: 更改parser的部分以支持index相关操作
+>>>>>>> feat: 更改parser的部分以支持index相关操作
 
