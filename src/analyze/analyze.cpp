@@ -23,6 +23,11 @@ std::shared_ptr<Query> Analyze::do_analyze(std::shared_ptr<ast::TreeNode> parse)
         // 处理表名
         query->tables = std::move(x->tabs);
         /** TODO: 检查表是否存在 */
+        for (auto &table : query->tables){
+            if(!sm_manager_->db_.is_table(table)){
+                throw TableNotFoundError(table);
+            }    
+        }
 
         // 处理target list，再target list中添加上表名，例如 a.id
         for (auto &sv_sel_col : x->cols) {
@@ -59,7 +64,19 @@ std::shared_ptr<Query> Analyze::do_analyze(std::shared_ptr<ast::TreeNode> parse)
             SetClause set_clause;
 
             set_clause.lhs = TabCol{.tab_name = x->tab_name, .col_name = sv_clause->col_name};
-            set_clause.rhs = convert_sv_value(sv_clause->val);
+
+            //添加int和bigint的转换
+            auto value = convert_sv_value(sv_clause->val);
+            ColMeta col = *(sm_manager_->db_.get_table(x->tab_name).get_col(set_clause.lhs.col_name));
+            if(col.type == TYPE_INT && value.type == TYPE_BIGINT) {
+                throw TypeOverflowError("INT", std::to_string(value.bigint_val));
+            }else if(col.type == TYPE_BIGINT && value.type == TYPE_INT) {
+                Value tmp;
+                tmp.set_bigint(value.int_val);
+                value = tmp;
+            }
+
+            set_clause.rhs = value;
             
             query->set_clauses.push_back(set_clause);
         }
@@ -73,10 +90,27 @@ std::shared_ptr<Query> Analyze::do_analyze(std::shared_ptr<ast::TreeNode> parse)
         get_clause(x->conds, query->conds);
         check_clause({x->tab_name}, query->conds);        
     } else if (auto x = std::dynamic_pointer_cast<ast::InsertStmt>(parse)) {
-        // 处理insert 的values值
-        for (auto &sv_val : x->vals) {
-            query->values.push_back(convert_sv_value(sv_val));
+
+        //添加判断int和bigint之间的转换
+        std::vector<ColMeta> cols;
+        get_all_cols({x->tab_name}, cols);
+        for(size_t i = 0; i < x->vals.size(); i++) {
+            auto value = convert_sv_value(x->vals[i]);
+            if(cols[i].type == TYPE_INT && value.type == TYPE_BIGINT) {
+                throw TypeOverflowError("INT", std::to_string(value.bigint_val));
+            }else if(cols[i].type == TYPE_BIGINT && value.type == TYPE_INT) {
+                Value tmp;
+                tmp.set_bigint(value.int_val);
+                query->values.push_back(tmp);
+            }else {
+                query->values.push_back(value);
+            }
         }
+
+        // // 处理insert 的values值
+        // for (auto &sv_val : x->vals) {
+        //     query->values.push_back(convert_sv_value(sv_val));
+        // }
     } else {
         // do nothing
     }
@@ -143,6 +177,18 @@ bool Analyze::comparable(ColType type1, ColType type2) {
     if (type1 == TYPE_FLOAT && type2 == TYPE_INT) {
         return true;
     }
+    if (type1 == TYPE_INT && type2 == TYPE_BIGINT) {
+        return true;
+    }
+    if (type1 == TYPE_BIGINT && type2 == TYPE_INT) {
+        return true;
+    }
+    if (type1 == TYPE_BIGINT && type2 == TYPE_FLOAT) {
+        return true;
+    }
+    if (type1 == TYPE_FLOAT && type2 == TYPE_BIGINT) {
+        return true;
+    }
     return false;
 }
 
@@ -163,7 +209,15 @@ void Analyze::check_clause(const std::vector<std::string> &tab_names, std::vecto
         ColType lhs_type = lhs_col->type;
         ColType rhs_type;
         if (cond.is_rhs_val) {
-            cond.rhs_val.init_raw(lhs_col->len);
+            //添加int和bigint转换
+            if(lhs_col->type == TYPE_INT && cond.rhs_val.type == TYPE_BIGINT) {
+                throw TypeOverflowError("INT", std::to_string(cond.rhs_val.bigint_val));
+            }else if(lhs_col->type == TYPE_BIGINT && cond.rhs_val.type == TYPE_INT) {
+                Value tmp;
+                tmp.set_bigint(cond.rhs_val.int_val);
+                cond.rhs_val = tmp;
+            }
+            // cond.rhs_val.init_raw(lhs_col->len);
             rhs_type = cond.rhs_val.type;
         } else {
             TabMeta &rhs_tab = sm_manager_->db_.get_table(cond.rhs_col.tab_name);
@@ -174,6 +228,7 @@ void Analyze::check_clause(const std::vector<std::string> &tab_names, std::vecto
             // throw IncompatibleTypeError(coltype2str(lhs_type), coltype2str(rhs_type));
         // }
         if (!comparable(lhs_type, rhs_type)) {
+            std::cout<<"analyze check_clause"<<std::endl;
             throw IncompatibleTypeError(coltype2str(lhs_type), coltype2str(rhs_type));
         }
     }
@@ -187,6 +242,10 @@ Value Analyze::convert_sv_value(const std::shared_ptr<ast::Value> &sv_val) {
         val.set_float(float_lit->val);
     } else if (auto str_lit = std::dynamic_pointer_cast<ast::StringLit>(sv_val)) {
         val.set_str(str_lit->val);
+    } else if (auto bigint_lit = std::dynamic_pointer_cast<ast::BigIntLit>(sv_val)){
+        val.set_bigint(bigint_lit->val);
+    } else if(auto datetime_lit = std::dynamic_pointer_cast<ast::DateTimeLit>(sv_val)) {
+        val.set_datetime(datetime_lit->val);
     } else {
         throw InternalError("Unexpected sv value type");
     }
