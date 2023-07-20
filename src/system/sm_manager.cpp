@@ -238,6 +238,9 @@ void SmManager::drop_table(const std::string& tab_name, Context* context) {
         throw TableNotFoundError(tab_name);
     }
 
+    // 删除表
+    fhs_.erase(tab_name);
+
     // 删除元数据
 
     db_.tabs_.erase(tab_name);

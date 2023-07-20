@@ -183,6 +183,12 @@ bool Analyze::comparable(ColType type1, ColType type2) {
     if (type1 == TYPE_BIGINT && type2 == TYPE_INT) {
         return true;
     }
+    if (type1 == TYPE_BIGINT && type2 == TYPE_FLOAT) {
+        return true;
+    }
+    if (type1 == TYPE_FLOAT && type2 == TYPE_BIGINT) {
+        return true;
+    }
     return false;
 }
 
@@ -211,7 +217,7 @@ void Analyze::check_clause(const std::vector<std::string> &tab_names, std::vecto
                 tmp.set_bigint(cond.rhs_val.int_val);
                 cond.rhs_val = tmp;
             }
-            cond.rhs_val.init_raw(lhs_col->len);
+            // cond.rhs_val.init_raw(lhs_col->len);
             rhs_type = cond.rhs_val.type;
         } else {
             TabMeta &rhs_tab = sm_manager_->db_.get_table(cond.rhs_col.tab_name);
@@ -222,6 +228,7 @@ void Analyze::check_clause(const std::vector<std::string> &tab_names, std::vecto
             // throw IncompatibleTypeError(coltype2str(lhs_type), coltype2str(rhs_type));
         // }
         if (!comparable(lhs_type, rhs_type)) {
+            std::cout<<"analyze check_clause"<<std::endl;
             throw IncompatibleTypeError(coltype2str(lhs_type), coltype2str(rhs_type));
         }
     }

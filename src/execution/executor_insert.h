@@ -15,14 +15,14 @@ See the Mulan PSL v2 for more details. */
 #include "index/ix.h"
 #include "system/sm.h"
 
-class InsertExecutor : public AbstractExecutor {
+class InsertExecutor : public AbstractExecutor, ConditionDependedExecutor {
    private:
     TabMeta tab_;                   // 表的元数据
     std::vector<Value> values_;     // 需要插入的数据
     RmFileHandle *fh_;              // 表的数据文件句柄
-    std::string tab_name_;          // 表名称
+    // std::string tab_name_;          // 表名称
     Rid rid_;                       // 插入的位置，由于系统默认插入时不指定位置，因此当前rid_在插入后才赋值
-    SmManager *sm_manager_;
+    // SmManager *sm_manager_;
 
    public:
     InsertExecutor(SmManager *sm_manager, const std::string &tab_name, std::vector<Value> values, Context *context) {
@@ -45,11 +45,12 @@ class InsertExecutor : public AbstractExecutor {
         for (size_t i = 0; i < values_.size(); i++) {
             auto &col = tab_.cols[i];
             auto &val = values_[i];
-            if (col.type != val.type) {
+            Value *new_val = insert_compatible(col.type, val);
+            if (new_val==nullptr) {
                 throw IncompatibleTypeError(coltype2str(col.type), coltype2str(val.type));
             }
-            val.init_raw(col.len);
-            memcpy(rec.data + col.offset, val.raw->data, col.len);
+            new_val->init_raw(col.len);
+            memcpy(rec.data + col.offset, new_val->raw->data, col.len);
         }
         // Insert into record file
         rid_ = fh_->insert_record(rec.data, context_);
@@ -68,5 +69,6 @@ class InsertExecutor : public AbstractExecutor {
         }
         return nullptr;
     }
+
     Rid &rid() override { return rid_; }
 };
