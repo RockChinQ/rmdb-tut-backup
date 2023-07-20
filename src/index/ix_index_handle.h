@@ -31,6 +31,7 @@ inline int ix_compare(const char *a, const char *b, ColType type, int col_len) {
         }
         case TYPE_STRING:
             return memcmp(a, b, col_len);
+        // TODO(types): add more types
         default:
             throw InternalError("Unexpected data type");
     }
@@ -155,6 +156,8 @@ class IxNodeHandle {
         assert(rid_idx < page_hdr->num_key);
         return rid_idx;
     }
+
+    bool exist_key(const char *key) const;
 };
 
 /* B+树 */

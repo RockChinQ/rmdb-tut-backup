@@ -22,8 +22,17 @@ int IxNodeHandle::lower_bound(const char *target) const {
     // Todo:
     // 查找当前节点中第一个大于等于target的key，并返回key的位置给上层
     // 提示: 可以采用多种查找方式，如顺序遍历、二分查找等；使用ix_compare()函数进行比较
+    
+    // 遍历每一个key
+    int i=0;
+    for(i = 0; i < page_hdr->num_key; ++i) {
+        char* cur_key = keys + i * file_hdr->col_tot_len_;
+        if (ix_compare(cur_key, target, file_hdr->col_types_, file_hdr->col_lens_) >= 0) {
+            return i;
+        }
+    }
 
-    return -1;
+    return i;
 }
 
 /**
@@ -37,7 +46,16 @@ int IxNodeHandle::upper_bound(const char *target) const {
     // 查找当前节点中第一个大于target的key，并返回key的位置给上层
     // 提示: 可以采用多种查找方式：顺序遍历、二分查找等；使用ix_compare()函数进行比较
 
-    return -1;
+    // 遍历每一个key
+    int i=0;
+    for (i = 0; i < page_hdr->num_key; ++i) {
+        char* cur_key = keys + i * file_hdr->col_tot_len_;
+        if (ix_compare(cur_key, target, file_hdr->col_types_, file_hdr->col_lens_) > 0) {
+            return i;
+        }
+    }
+
+    return i;
 }
 
 /**
@@ -55,7 +73,18 @@ bool IxNodeHandle::leaf_lookup(const char *key, Rid **value) {
     // 3. 如果存在，获取key对应的Rid，并赋值给传出参数value
     // 提示：可以调用lower_bound()和get_rid()函数。
 
-    return false;
+    // 1. 在叶子节点中获取目标key所在位置
+    int idx = lower_bound(key);
+
+    // 2. 判断目标key是否存在
+    if (idx == page_hdr->num_key || ix_compare(key, keys + idx * file_hdr->col_tot_len_, file_hdr->col_types_, file_hdr->col_lens_) != 0) {
+        return false;
+    }
+
+    // 3. 如果存在，获取key对应的Rid，并赋值给传出参数value
+    *value = get_rid(idx);
+    return true;
+
 }
 
 /**
@@ -66,10 +95,16 @@ bool IxNodeHandle::leaf_lookup(const char *key, Rid **value) {
 page_id_t IxNodeHandle::internal_lookup(const char *key) {
     // Todo:
     // 1. 查找当前非叶子节点中目标key所在孩子节点（子树）的位置
-    // 2. 获取该孩子节点（子树）所在页面的编号
-    // 3. 返回页面编号
 
-    return -1;
+    int pos = lower_bound(key);
+    
+    // 2. 获取该孩子节点（子树）所在页面的编号
+    
+    auto next = rids + pos * sizeof(Rid);
+    
+    // 3. 返回页面编号
+    
+    return next->page_no;
 }
 
 /**

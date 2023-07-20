@@ -95,6 +95,11 @@ void QlManager::run_cmd_utility(std::shared_ptr<Plan> plan, txn_id_t *txn_id, Co
                 sm_manager_->desc_table(x->tab_name_, context);
                 break;
             }
+            case T_ShowIndex:
+            {
+                sm_manager_->show_index(x->tab_name_, context);
+                break;
+            }
             case T_Transaction_begin:
             {
                 // 显示开启一个事务

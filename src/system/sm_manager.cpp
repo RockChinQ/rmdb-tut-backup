@@ -260,7 +260,52 @@ void SmManager::drop_table(const std::string& tab_name, Context* context) {
  * @param {Context*} context
  */
 void SmManager::create_index(const std::string& tab_name, const std::vector<std::string>& col_names, Context* context) {
+    // 检查表名
+    if (!db_.is_table(tab_name)) {
+        throw TableNotFoundError(tab_name);
+    }
+
+    // 检查字段名
+    auto &tab = db_.get_table(tab_name);
+
+    for (auto &col_name : col_names) {
+        if (!tab.is_col(col_name)) {
+            throw ColumnNotFoundError(col_name);
+        }
+    }
     
+    // 检查索引是否存在
+    if (ix_manager_->exists(tab_name, col_names)) {
+        throw IndexExistsError(tab_name, col_names);
+    }
+
+    std::string ix_file_name = tab_name;
+
+    // 构建colMeta的vector
+    std::vector<ColMeta> cols;
+
+    IndexMeta ix_meta;
+    ix_meta.tab_name = tab_name;
+    ix_meta.col_tot_len = 0;
+    ix_meta.col_num = col_names.size();
+
+    for (auto &col_name : col_names) {
+
+        ColMeta col = tab.get_col(col_name)[0];
+
+        ix_meta.col_tot_len += col.len;
+        ix_meta.cols.push_back(col);
+        cols.push_back(col);
+    }
+
+    // 创建索引
+    ix_manager_->create_index(ix_file_name, cols);
+
+    // 添加到TabMeta中
+    tab.indexes.push_back(ix_meta);
+    flush_meta();
+
+    std::cout<<"create index success"<<std::endl;
 }
 
 /**
@@ -270,7 +315,48 @@ void SmManager::create_index(const std::string& tab_name, const std::vector<std:
  * @param {Context*} context
  */
 void SmManager::drop_index(const std::string& tab_name, const std::vector<std::string>& col_names, Context* context) {
-    
+    // 检查表名
+    if (!db_.is_table(tab_name)) {
+        throw TableNotFoundError(tab_name);
+    }
+
+    // 存在性检查
+    if (!ix_manager_->exists(tab_name, col_names)) {
+        throw IndexNotFoundError(tab_name, col_names);
+    }
+
+    // 删除索引文件
+    ix_manager_->destroy_index(tab_name, col_names);
+
+    // 删除TabMeta中的索引
+    for (auto it = db_.get_table(tab_name).indexes.begin(); it != db_.get_table(tab_name).indexes.end(); it++) {
+        if (it->tab_name == tab_name && it->col_num == col_names.size()) {
+            bool flag = true;
+            for (int i = 0; i < col_names.size(); i++) {
+                if (it->cols[i].name != col_names[i]) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (flag) {
+                db_.get_table(tab_name).indexes.erase(it);
+                break;
+            }
+        }
+    }
+
+    flush_meta();
+
+    std::cout<<"drop index success"<<std::endl;
+}
+
+/**
+ * @description: 显示索引
+ * @param {string&} tab_name 表名称
+ * @param {Context*} context
+ */
+void SmManager::show_index(const std::string& tab_name, Context* context) {
+    std::cout<<"show index called"<<std::endl;
 }
 
 /**
