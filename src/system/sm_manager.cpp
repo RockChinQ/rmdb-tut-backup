@@ -369,6 +369,12 @@ void SmManager::show_index(const std::string& tab_name, Context* context) {
 
     outfile.open("output.txt", std::ios::out | std::ios::app);
 
+    RecordPrinter printer(3);
+
+    printer.print_separator(context);
+    printer.print_record({"Table", "Unique", "Column_names"}, context);
+    printer.print_separator(context);
+
     // for 所有索引
     for (auto &ix_meta : tab.indexes) {
         // 打印表名
@@ -380,13 +386,18 @@ void SmManager::show_index(const std::string& tab_name, Context* context) {
         // 打印字段名
         outfile << "| (";
         outfile << ix_meta.cols[0].name;
+        std::string col_name = "("+ix_meta.cols[0].name;
         for (int i = 1; i < ix_meta.col_num; i++) {
             outfile << "," << ix_meta.cols[i].name;
+            col_name += ","+ix_meta.cols[i].name;
         }
+        col_name += ")";
+        printer.print_record({tab_name, "unique", col_name}, context);
         outfile << ") |\n";
         // // 打印索引名
         // outfile << "| " << ix_manager_->get_index_name(tab_name, ix_meta.cols) << " |\n";
     }
+    printer.print_separator(context);
     outfile.close();
 }
 
@@ -397,5 +408,13 @@ void SmManager::show_index(const std::string& tab_name, Context* context) {
  * @param {Context*} context
  */
 void SmManager::drop_index(const std::string& tab_name, const std::vector<ColMeta>& cols, Context* context) {
-    
+    // 直接提取字段名
+    std::vector<std::string> col_names;
+
+    for (auto &col : cols) {
+        col_names.push_back(col.name);
+    }
+
+    drop_index(tab_name, col_names, context);
+    // 我真是天才
 }
