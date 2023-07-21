@@ -370,6 +370,35 @@ std::shared_ptr<Plan> Planner::do_planner(std::shared_ptr<Query> query, Context 
         std::shared_ptr<Plan> projection = generate_select_plan(std::move(query), context);
         plannerRoot = std::make_shared<DMLPlan>(T_select, projection, std::string(), std::vector<Value>(),
                                                     std::vector<Condition>(), std::vector<SetClause>());
+    }else if (auto x = std::dynamic_pointer_cast<ast::AggreStmt>(query->parse)){
+        // aggre
+        // 生成表扫描方式
+        std::shared_ptr<Plan> table_scan_executors;
+        // 只有一张表，不需要进行物理优化了
+        // int index_no = get_indexNo(x->tab_name, query->conds);
+        std::vector<std::string> index_col_names;
+        //auto [index_exist, index_meta] = get_index_cols(x->tab_name, query->conds, index_col_names);
+        bool index_exist = get_index_cols(x->tab_name, query->conds, index_col_names);
+        if (index_exist == false) {  // 该表没有索引
+            index_col_names.clear();
+            table_scan_executors = 
+                std::make_shared<ScanPlan>(T_SeqScan, sm_manager_, x->tab_name, query->conds, index_col_names);
+        } else {  // 存在索引
+
+            // auto index_scan = std::make_shared<ScanPlan>(T_IndexScan, sm_manager_, x->tab_name, query->conds, index_col_names);
+            // // 将找到的最匹配的索引赋给index_scan plan
+            // index_scan->index_meta_ = index_meta;
+            // table_scan_executors = index_scan;
+
+            table_scan_executors =
+                std::make_shared<ScanPlan>(T_IndexScan, sm_manager_, x->tab_name, query->conds, index_col_names);
+        }
+        auto aggre_plan = std::make_shared<DMLPlan>(T_Aggre, table_scan_executors, x->tab_name,  
+                                                std::vector<Value>(), query->conds, std::vector<SetClause>());
+        // 传入aggre_meta和output_col_
+        aggre_plan->aggre_meta_ = query->aggre_meta;
+        aggre_plan->output_col_ = query->cols;
+        plannerRoot = aggre_plan;
     } else {
         throw InternalError("Unexpected AST root");
     }

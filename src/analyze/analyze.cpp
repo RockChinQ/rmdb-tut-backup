@@ -106,11 +106,32 @@ std::shared_ptr<Query> Analyze::do_analyze(std::shared_ptr<ast::TreeNode> parse)
                 query->values.push_back(value);
             }
         }
-
         // // 处理insert 的values值
         // for (auto &sv_val : x->vals) {
         //     query->values.push_back(convert_sv_value(sv_val));
         // }
+    } else if(auto x = std::dynamic_pointer_cast<ast::AggreStmt>(parse)) {
+        // 处理表名
+        std::string table_name = x->tab_name;
+        if(!sm_manager_->db_.is_table(table_name)){
+            throw TableNotFoundError(table_name);
+        }  
+        query->tables.push_back(table_name);
+        auto table_meta = sm_manager_->db_.get_table(table_name);
+        // 检查列名
+        if(!x->aggre_col->col_name.empty()) {
+            if(!table_meta.is_col(x->aggre_col->col_name)) {
+                throw ColumnNotFoundError(x->aggre_col->col_name);
+            }
+        }
+        TabCol output_col = {.tab_name = table_name, .col_name = x->aggre_col->as_name};
+        TabCol sel_col = {.tab_name = table_name, .col_name = x->aggre_col->col_name};
+        query->cols.push_back(output_col);
+        query->aggre_meta = {.tabcol_ = sel_col, .op_ = convert_sv_aggre_op(x->aggre_col->ag_type)};
+        //处理where条件
+
+        get_clause(x->conds, query->conds);
+        check_clause(query->tables, query->conds);
     } else {
         // do nothing
     }
@@ -258,4 +279,12 @@ CompOp Analyze::convert_sv_comp_op(ast::SvCompOp op) {
         {ast::SV_OP_GT, OP_GT}, {ast::SV_OP_LE, OP_LE}, {ast::SV_OP_GE, OP_GE},
     };
     return m.at(op);
+}
+
+AggreOp Analyze::convert_sv_aggre_op(ast::SvAggreType type) {
+    std::map<ast::SvAggreType, AggreOp> m = {
+        {ast::SV_AGGRE_COUNT, AG_COUNT}, {ast::SV_AGGRE_MAX, AG_MAX},
+        {ast::SV_AGGRE_MIN, AG_MIN}, {ast::SV_AGGRE_SUM, AG_SUM}
+    };
+    return m[type];
 }

@@ -34,6 +34,8 @@ class Query{
     std::vector<SetClause> set_clauses;
     //insert 的values值
     std::vector<Value> values;
+    // 聚合的meta值
+    AggreMeta aggre_meta;
 
     Query(){}
 
@@ -57,5 +59,6 @@ private:
     Value convert_sv_value(const std::shared_ptr<ast::Value> &sv_val);
     CompOp convert_sv_comp_op(ast::SvCompOp op);
     bool comparable(ColType type1, ColType type2);
+    AggreOp convert_sv_aggre_op(ast::SvAggreType type);
 };
 

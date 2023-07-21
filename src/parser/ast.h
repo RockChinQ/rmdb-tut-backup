@@ -32,6 +32,13 @@ enum OrderByDir {
     OrderBy_DESC
 };
 
+enum SvAggreType {
+    SV_AGGRE_COUNT,
+    SV_AGGRE_SUM,
+    SV_AGGRE_MAX,
+    SV_AGGRE_MIN
+};
+
 // Base class for tree nodes
 struct TreeNode {
     virtual ~TreeNode() = default;  // enable polymorphism
@@ -239,6 +246,32 @@ struct SelectStmt : public TreeNode {
             }
 };
 
+// 聚合元信息
+struct AggreCol : public Expr {
+    SvAggreType ag_type;
+    std::string col_name;
+    std::string as_name;    //别名
+    AggreCol(SvAggreType ag_type_, std::string col_name_, std::string as_name_) :
+        ag_type(ag_type_), col_name(col_name_), as_name(std::move(as_name_)) {
+
+        }
+};
+
+struct AggreStmt : public TreeNode {
+    // 聚合函数
+    std::shared_ptr<AggreCol> aggre_col;
+    std::string tab_name;
+    std::vector<std::shared_ptr<BinaryExpr>> conds;
+
+    AggreStmt(  std::shared_ptr<AggreCol> aggre_col_, 
+                std::string tab_name_,
+                std::vector<std::shared_ptr<BinaryExpr>> conds_) :
+            aggre_col(std::move(aggre_col_)), tab_name(std::move(tab_name_)), conds(std::move(conds_))
+            {
+                
+            }
+};
+
 // Semantic value
 struct SemValue {
     int sv_int;
@@ -250,6 +283,7 @@ struct SemValue {
     std::shared_ptr<TreeNode> sv_node;
 
     SvCompOp sv_comp_op;
+    SvAggreType sv_ag_type;   //聚合type
 
     std::shared_ptr<TypeLen> sv_type_len;
 
@@ -271,6 +305,8 @@ struct SemValue {
     std::vector<std::shared_ptr<BinaryExpr>> sv_conds;
 
     std::shared_ptr<OrderBy> sv_orderby;
+
+     std::shared_ptr<AggreCol> sv_aggre_col; //聚合col
 };
 
 extern std::shared_ptr<ast::TreeNode> parse_tree;
