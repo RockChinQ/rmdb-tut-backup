@@ -22,7 +22,8 @@ using namespace ast;
 
 // keywords
 %token SHOW TABLES CREATE TABLE DROP DESC INSERT INTO VALUES DELETE FROM ASC ORDER BY
-WHERE UPDATE SET SELECT INT CHAR FLOAT BIGINT DATETIME INDEX AND JOIN EXIT HELP TXN_BEGIN TXN_COMMIT TXN_ABORT TXN_ROLLBACK ORDER_BY
+WHERE UPDATE SET SELECT INT CHAR FLOAT BIGINT DATETIME INDEX AND JOIN EXIT HELP TXN_BEGIN TXN_COMMIT TXN_ABORT TXN_ROLLBACK ORDER_BY AS
+SUM COUNT MAX MIN
 // non-keywords
 %token LEQ NEQ GEQ T_EOF
 
@@ -52,6 +53,8 @@ WHERE UPDATE SET SELECT INT CHAR FLOAT BIGINT DATETIME INDEX AND JOIN EXIT HELP 
 %type <sv_conds> whereClause optWhereClause
 %type <sv_orderby>  order_clause opt_order_clause
 %type <sv_orderby_dir> opt_asc_desc
+%type <sv_aggre_col> aggregator
+%type <sv_ag_type> AGGRE_SUM AGGRE_COUNT AGGRE_MAX AGGRE_MIN
 
 %%
 start:
@@ -149,6 +152,10 @@ dml:
     |   SELECT selector FROM tableList optWhereClause opt_order_clause
     {
         $$ = std::make_shared<SelectStmt>($2, $4, $5, $6);
+    }
+    |   SELECT aggregator FROM tbName optWhereClause
+    {
+        $$ = std::make_shared<AggreStmt>($2, $4, $5);
     }
     ;
 
@@ -350,6 +357,59 @@ selector:
         $$ = {};
     }
     |   colList
+    ;
+
+    aggregator:
+        AGGRE_SUM '(' colName ')' AS colName
+    {
+        $$ = std::make_shared<AggreCol>($1, $3, $6);
+    }
+    |
+        AGGRE_MIN '(' colName ')' AS colName
+    {
+        $$ = std::make_shared<AggreCol>($1, $3, $6);
+    }
+    |
+        AGGRE_MAX '(' colName ')' AS colName
+    {
+        $$ = std::make_shared<AggreCol>($1, $3, $6);
+    }
+    |   AGGRE_COUNT '(' colName ')' AS colName
+    {
+        $$ = std::make_shared<AggreCol>($1, $3, $6);
+    }
+    |   AGGRE_COUNT '(' '*' ')' AS colName
+    {
+        $$ = std::make_shared<AggreCol>($1, "", $6);
+    }
+    ;
+
+AGGRE_SUM:
+        SUM
+    {
+        $$ = SV_AGGRE_SUM;
+    }
+    ;
+
+AGGRE_COUNT:
+        COUNT
+    {
+        $$ = SV_AGGRE_COUNT;
+    }
+    ;
+
+AGGRE_MAX:
+        MAX
+    {
+        $$ = SV_AGGRE_MAX;
+    }
+    ;
+
+AGGRE_MIN:
+        MIN
+    {
+        $$ = SV_AGGRE_MIN;
+    }
     ;
 
 tableList:

@@ -315,3 +315,18 @@ struct SetClause {
 
     SetClause(TabCol lhs_, Value rhs_) : lhs(std::move(lhs_)), rhs(std::move(rhs_)) {}
 };
+
+// 增加聚合操作类型
+enum AggreOp { AG_COUNT, AG_SUM, AG_MAX, AG_MIN};
+
+// 增加AggreMeta
+struct AggreMeta {
+    TabCol tabcol_;
+    AggreOp op_;
+};
+
+// 增加OrderByCol类型
+struct OrderByCol {
+    TabCol tabcol;
+    bool is_desc;
+};

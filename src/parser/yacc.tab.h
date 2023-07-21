@@ -34,8 +34,8 @@
 /* Undocumented macros, especially those whose name start with YY_,
    are private implementation details.  Do not rely on them.  */
 
-#ifndef YY_YY_YACC_TAB_H_INCLUDED
-# define YY_YY_YACC_TAB_H_INCLUDED
+#ifndef YY_YY_HOME_JHAOC_CPP_RMDB_TUT_SRC_PARSER_YACC_TAB_H_INCLUDED
+# define YY_YY_HOME_JHAOC_CPP_RMDB_TUT_SRC_PARSER_YACC_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -82,16 +82,21 @@ extern int yydebug;
     TXN_ABORT = 288,
     TXN_ROLLBACK = 289,
     ORDER_BY = 290,
-    LEQ = 291,
-    NEQ = 292,
-    GEQ = 293,
-    T_EOF = 294,
-    IDENTIFIER = 295,
-    VALUE_STRING = 296,
-    VALUE_INT = 297,
-    VALUE_FLOAT = 298,
-    VALUE_BIGINT = 299,
-    VALUE_DATETIME = 300
+    AS = 291,
+    SUM = 292,
+    COUNT = 293,
+    MAX = 294,
+    MIN = 295,
+    LEQ = 296,
+    NEQ = 297,
+    GEQ = 298,
+    T_EOF = 299,
+    IDENTIFIER = 300,
+    VALUE_STRING = 301,
+    VALUE_INT = 302,
+    VALUE_FLOAT = 303,
+    VALUE_BIGINT = 304,
+    VALUE_DATETIME = 305
   };
 #endif
 
@@ -115,4 +120,4 @@ struct YYLTYPE
 
 int yyparse (void);
 
-#endif /* !YY_YY_YACC_TAB_H_INCLUDED  */
+#endif /* !YY_YY_HOME_JHAOC_CPP_RMDB_TUT_SRC_PARSER_YACC_TAB_H_INCLUDED  */

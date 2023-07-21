@@ -23,6 +23,7 @@ See the Mulan PSL v2 for more details. */
 #include "execution/executor_insert.h"
 #include "execution/executor_delete.h"
 #include "execution/execution_sort.h"
+#include "execution/execution_aggregation.h"
 #include "common/common.h"
 
 typedef enum portalTag{
@@ -105,6 +106,17 @@ class Portal
                     return std::make_shared<PortalStmt>(PORTAL_DML_WITHOUT_SELECT, std::vector<TabCol>(), std::move(root), plan);
                 }
 
+                case T_Aggre:
+                {
+                    std::unique_ptr<AbstractExecutor> scan= convert_plan_executor(x->subplan_, context);
+                    std::vector<Rid> rids;
+                    for (scan->beginTuple(); !scan->is_end(); scan->nextTuple()) {
+                        rids.push_back(scan->rid());
+                    }
+                    std::unique_ptr<AbstractExecutor> root =std::make_unique<AggregationExecutor>(sm_manager_, 
+                                                            x->tab_name_, x->conds_, x->aggre_meta_, rids, context);
+                    return std::make_shared<PortalStmt>(PORTAL_ONE_SELECT, std::move(x->output_col_), std::move(root), plan);
+                }
 
                 default:
                     throw InternalError("Unexpected field type");

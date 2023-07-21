@@ -40,7 +40,8 @@ typedef enum PlanTag{
     T_IndexScan,
     T_NestLoop,
     T_Sort,
-    T_Projection
+    T_Projection,
+    T_Aggre,  // 增加Aggregation
 } PlanTag;
 
 // 查询执行计划
@@ -153,6 +154,9 @@ class DMLPlan : public Plan
         std::vector<Value> values_;
         std::vector<Condition> conds_;
         std::vector<SetClause> set_clauses_;
+        // 增加Aggregation
+        AggreMeta aggre_meta_;
+        std::vector<TabCol> output_col_;
 };
 
 // ddl语句, 包括create/drop table; create/drop index;
