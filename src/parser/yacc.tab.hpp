@@ -82,6 +82,7 @@ extern int yydebug;
     TXN_ABORT = 288,
     TXN_ROLLBACK = 289,
     ORDER_BY = 290,
+<<<<<<< HEAD
     LIMIT = 291,
     AS = 292,
     SUM = 293,
@@ -98,6 +99,23 @@ extern int yydebug;
     VALUE_FLOAT = 304,
     VALUE_BIGINT = 305,
     VALUE_DATETIME = 306
+=======
+    AS = 291,
+    SUM = 292,
+    COUNT = 293,
+    MAX = 294,
+    MIN = 295,
+    LEQ = 296,
+    NEQ = 297,
+    GEQ = 298,
+    T_EOF = 299,
+    IDENTIFIER = 300,
+    VALUE_STRING = 301,
+    VALUE_INT = 302,
+    VALUE_FLOAT = 303,
+    VALUE_BIGINT = 304,
+    VALUE_DATETIME = 305
+>>>>>>> feat: 拉取聚合函数部分内容
   };
 #endif
 
