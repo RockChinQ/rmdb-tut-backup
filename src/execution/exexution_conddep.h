@@ -72,6 +72,35 @@ class ConditionDependedExecutor {
         return val;
     }
 
+    // 从Record中取出某一列的Value
+    Value get_record_value(const std::unique_ptr<RmRecord> &record, const ColMeta& col_meta) const {
+        Value val;
+        val.type = col_meta.type;
+  
+        if(col_meta.type == TYPE_INT) {
+            val.set_int(*(int *)(record->data + col_meta.offset));
+        }else if(col_meta.type == TYPE_FLOAT) {
+            val.set_float(*(float *)(record->data + col_meta.offset));
+        }else if(col_meta.type == TYPE_STRING) {
+            int offset = col_meta.offset;
+            int len = col_meta.len;
+
+            val.set_str(std::string(record->data + offset, len));
+        }else if(col_meta.type == TYPE_BIGINT) {
+            int64_t tmp;
+            memcpy((char*)&tmp, record->data + col_meta.offset, col_meta.len);
+            val.set_bigint(tmp);
+        }else if(col_meta.type == TYPE_DATETIME) {
+            uint64_t tmp;
+            memcpy((char*)&tmp, record->data + col_meta.offset, col_meta.len);
+            val.set_datetime(tmp);
+        }else {
+            throw InvalidTypeError();
+        }
+        val.init_raw(col_meta.len);
+        return val;
+    }
+
     bool check_conds(const std::vector<Condition> &conds, const RmRecord &record) {
         for (auto &cond : conds) {
             if (!check_cond(cond, record)) {

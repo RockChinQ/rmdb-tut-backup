@@ -59,6 +59,7 @@ class NestedLoopJoinExecutor : public AbstractExecutor, public ConditionDepended
         left_->beginTuple();
         right_->beginTuple();
 
+        isend = false;
     }
 
     void nextTuple() override {

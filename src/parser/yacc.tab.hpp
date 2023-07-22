@@ -82,16 +82,22 @@ extern int yydebug;
     TXN_ABORT = 288,
     TXN_ROLLBACK = 289,
     ORDER_BY = 290,
-    LEQ = 291,
-    NEQ = 292,
-    GEQ = 293,
-    T_EOF = 294,
-    IDENTIFIER = 295,
-    VALUE_STRING = 296,
-    VALUE_INT = 297,
-    VALUE_FLOAT = 298,
-    VALUE_BIGINT = 299,
-    VALUE_DATETIME = 300
+    LIMIT = 291,
+    AS = 292,
+    SUM = 293,
+    COUNT = 294,
+    MAX = 295,
+    MIN = 296,
+    LEQ = 297,
+    NEQ = 298,
+    GEQ = 299,
+    T_EOF = 300,
+    IDENTIFIER = 301,
+    VALUE_STRING = 302,
+    VALUE_INT = 303,
+    VALUE_FLOAT = 304,
+    VALUE_BIGINT = 305,
+    VALUE_DATETIME = 306
   };
 #endif
 
