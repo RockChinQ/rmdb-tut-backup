@@ -89,6 +89,7 @@ single_op ";"|"("|")"|","|"*"|"="|">"|"<"|"."
 "ORDER" { return ORDER; }
 "BY" {  return BY;  }
 "ASC" { return ASC; }
+"LIMIT" { return LIMIT; }
 "COUNT" { return COUNT; }
 "MAX" { return MAX; }
 "MIN" { return MIN; }
