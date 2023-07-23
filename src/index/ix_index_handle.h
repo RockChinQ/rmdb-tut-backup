@@ -165,7 +165,16 @@ class IxNodeHandle {
         return rid_idx;
     }
 
-    bool exist_key(const char *key) const;
+    bool exist_key(const char *key) const {
+        int key_num = page_hdr->num_key;
+        for(int i = 0;i<key_num;i++){
+            char *key_addr = get_key(i);
+            if(ix_compare(key, key_addr, file_hdr->col_types_, file_hdr->col_lens_) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 /* B+树 */

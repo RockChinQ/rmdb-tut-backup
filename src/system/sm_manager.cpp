@@ -107,6 +107,9 @@ void SmManager::open_db(const std::string& db_name) {
         // fhs_[tab.name] = rm_manager_->open_file(tab.name);
 
         // TODO: 加载索引
+        for (auto &ix_meta : tab.indexes) {
+            ihs_.emplace(ix_manager_->get_index_name(tab.name, ix_meta.cols), ix_manager_->open_index(tab.name, ix_meta.cols));
+        }
     }
 }
 
@@ -307,6 +310,8 @@ void SmManager::create_index(const std::string& tab_name, const std::vector<std:
     // 创建索引
     ix_manager_->create_index(ix_file_name, cols);
 
+    // ihs_.emplace(ix_manager_->get_index_name(tab_name, col_names), ix_manager_->open_index(ix_file_name, cols));
+
     // 添加到TabMeta中
     tab.indexes.push_back(ix_meta);
     flush_meta();
@@ -350,6 +355,8 @@ void SmManager::drop_index(const std::string& tab_name, const std::vector<std::s
             }
         }
     }
+
+    ihs_.erase(ix_manager_->get_index_name(tab_name, col_names));
 
     flush_meta();
 
