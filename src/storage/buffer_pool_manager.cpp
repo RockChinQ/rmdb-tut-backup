@@ -328,3 +328,27 @@ void BufferPoolManager::flush_all_pages(int fd) {
         }
     }
 }
+
+void BufferPoolManager::delete_all_pages(int fd) {
+    std::scoped_lock lock{latch_};
+    std::vector<PageId> to_be_deleted;
+    for(auto& [page_id, frame] : page_table_) {
+        if(page_id.fd == fd) {
+            to_be_deleted.push_back(page_id);
+        }
+    }
+
+    for(auto page_id : to_be_deleted) {
+        auto frame = page_table_[page_id];  
+        // 如果该页面还没有unpin，则unpin
+        replacer_->unpin(frame);
+        // 从页表中删除该页面并添加到free_list中
+        Page *page = &(pages_[frame]);
+        page->reset_memory();
+        page->is_dirty_ = false;
+        page->pin_count_ = 0;
+
+        page_table_.erase(page_id);
+        free_list_.emplace_back(frame);
+    }
+}
