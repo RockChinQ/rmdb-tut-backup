@@ -174,15 +174,6 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
             maxv.init_raw(col.len);
             minv.init_raw(col.len);
 
-            std::cout<<"internal loop done"<<std::endl;
-
-            std::cout<<"is upper_rec.data null: "<<(upper_rec.data == nullptr)<<std::endl;
-            std::cout<<"is maxv.raw null: "<<(maxv.raw == nullptr)<<std::endl;
-            std::cout<<"is maxv.raw->data null: "<<(maxv.raw->data == nullptr)<<std::endl;
-
-            std::cout<<"is lower_rec.data null: "<<(lower_rec.data == nullptr)<<std::endl;
-            std::cout<<"is minv.raw->data null: "<<(minv.raw->data == nullptr)<<std::endl;
-
             memcpy(upper_rec.data + off, maxv.raw->data, col.len);
             memcpy(lower_rec.data + off, minv.raw->data, col.len);
             off += col.len;
@@ -196,7 +187,12 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
         auto lower_id = ixh_->lower_bound(lower_rec.data);
         auto upper_id = ixh_->upper_bound(upper_rec.data);
 
+        std::cout<<"lower_id: ("<<lower_id.page_no<<", "<<lower_id.slot_no<<")"<<std::endl;
+        std::cout<<"upper_id: ("<<upper_id.page_no<<", "<<upper_id.slot_no<<")"<<std::endl;
+
         scan_ = std::make_unique<IxScan>(ixh_, lower_id, upper_id, sm_manager_->get_bpm());
+
+        std::cout<<"scan_->is_end() "<<scan_->is_end()<<std::endl;
 
         while(!scan_->is_end()) {
             rid_ = scan_->rid();
@@ -214,6 +210,7 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
             }
 
             if (flag){
+                std::cout<<"set rid in the begin: ("<<rid_.page_no<<","<<rid_.slot_no<<")"<<std::endl;
                 break;
             } else {
                 scan_->next();
@@ -222,6 +219,7 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
     }
 
     void nextTuple() override {
+        std::cout<<"IndexScanExecutor nextTuple"<<std::endl;
         scan_->next();
 
         while(!scan_->is_end()){
@@ -245,6 +243,7 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
                 scan_->next();
             }
         }
+        std::cout<<"IndexScanExecutor nextTuple done"<<std::endl;
     }
 
     std::unique_ptr<RmRecord> Next() override {
