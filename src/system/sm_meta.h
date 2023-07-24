@@ -124,6 +124,18 @@ struct TabMeta {
         return pos;
     }
 
+    bool is_col_to_index(const std::string &col_name){
+        for(auto& index: indexes){
+            auto &cols = index.cols;
+            for(auto it = cols.begin();it != cols.end();++it){
+                if(it->name == col_name){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     friend std::ostream &operator<<(std::ostream &os, const TabMeta &tab) {
         os << tab.name << '\n' << tab.cols.size() << '\n';
         for (auto &col : tab.cols) {

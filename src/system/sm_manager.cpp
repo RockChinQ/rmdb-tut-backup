@@ -300,7 +300,10 @@ void SmManager::create_index(const std::string& tab_name, const std::vector<std:
 
     for (auto &col_name : col_names) {
 
-        ColMeta col = tab.get_col(col_name)[0];
+        ColMeta &col = tab.get_col(col_name)[0];
+        //ColMeta &col = *db_.get_table(tab_name).get_col(col_name);
+
+        col.index = true;
 
         ix_meta.col_tot_len += col.len;
         ix_meta.cols.push_back(col);
@@ -334,6 +337,15 @@ void SmManager::drop_index(const std::string& tab_name, const std::vector<std::s
     // 存在性检查
     if (!ix_manager_->exists(tab_name, col_names)) {
         throw IndexNotFoundError(tab_name, col_names);
+    }
+
+        // 判断索引是否正确
+    TabMeta &tab = db_.tabs_[tab_name];
+    for(auto col_name : col_names) {
+        auto col = tab.get_col(col_name);
+        if(tab.is_col_to_index(col->name)){
+            col->index = false;
+        }
     }
 
     // 删除索引文件
