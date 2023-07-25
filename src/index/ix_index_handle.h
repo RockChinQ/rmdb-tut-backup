@@ -40,6 +40,15 @@ inline int ix_compare(const char *a, const char *b, ColType type, int col_len) {
         //     u_int64_t ia = *(u_int64_t *)a;
         //     u_int64_t ib = *(u_int64_t *)b;
         //     return (ia < ib) ? -1 : ((ia > ib) ? 1 : 0);
+        case TYPE_DATETIME:{
+            // type datetime以uint64位形式保存
+            uint64_t date_a = *(uint64_t *)a;
+            uint64_t date_b = *(uint64_t *)b;
+            return (date_a < date_b) ? -1 : ((date_a > date_b) ? 1 : 0);
+        }
+        case TYPE_BIGINT : {
+            throw RMDBError("In ix_index_handle, we don't implement bigint type");
+        }
         default:
             throw InternalError("Unexpected data type");
     }

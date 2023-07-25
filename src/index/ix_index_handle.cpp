@@ -23,16 +23,41 @@ int IxNodeHandle::lower_bound(const char *target) const {
     // 查找当前节点中第一个大于等于target的key，并返回key的位置给上层
     // 提示: 可以采用多种查找方式，如顺序遍历、二分查找等；使用ix_compare()函数进行比较
     
-    // 遍历每一个key
-    int i=0;
-    for(i = 0; i < page_hdr->num_key; ++i) {
-        char* cur_key = keys + i * file_hdr->col_tot_len_;
-        if (ix_compare(cur_key, target, file_hdr->col_types_, file_hdr->col_lens_) >= 0) {
-            return i;
-        }
-    }
+    // // 遍历每一个key
+    // int i=0;
+    // for(i = 0; i < page_hdr->num_key; ++i) {
+    //     char* cur_key = keys + i * file_hdr->col_tot_len_;
+    //     if (ix_compare(cur_key, target, file_hdr->col_types_, file_hdr->col_lens_) >= 0) {
+    //         return i;
+    //     }
+    // }
 
-    return i;
+    // return i;
+
+    if(binary_search) {
+        // 二分查找
+        int left = 0, right = page_hdr->num_key;
+        while(left < right) {
+            int mid = left + (right - left) / 2;
+            char *key_addr = get_key(mid);
+            if(ix_compare(target, key_addr, file_hdr->col_types_, file_hdr->col_lens_) <= 0) {
+                right = mid;
+            }else {
+                left = mid + 1;
+            }
+        }
+        return left;
+    }else {
+        // 顺序查找
+        int key_index = 0;
+        for(; key_index < page_hdr->num_key; key_index ++) {
+            char *key_addr = get_key(key_index);
+            if(ix_compare(target, key_addr, file_hdr->col_types_, file_hdr->col_lens_) <= 0) {
+                break;
+            }
+        }
+        return key_index;
+    }
 }
 
 /**
@@ -47,15 +72,39 @@ int IxNodeHandle::upper_bound(const char *target) const {
     // 提示: 可以采用多种查找方式：顺序遍历、二分查找等；使用ix_compare()函数进行比较
 
     // 遍历每一个key
-    int i=0;
-    for (i = 0; i < page_hdr->num_key; ++i) {
-        char* cur_key = keys + i * file_hdr->col_tot_len_;
-        if (ix_compare(cur_key, target, file_hdr->col_types_, file_hdr->col_lens_) > 0) {
-            return i;
-        }
-    }
+    // int i=0;
+    // for (i = 0; i < page_hdr->num_key; ++i) {
+    //     char* cur_key = keys + i * file_hdr->col_tot_len_;
+    //     if (ix_compare(cur_key, target, file_hdr->col_types_, file_hdr->col_lens_) > 0) {
+    //         return i;
+    //     }
+    // }
 
-    return i;
+    // return i;
+
+    if (binary_search) {
+        int left = 0, right = page_hdr->num_key;
+        while(left < right) {
+            int mid = left + (right - left) / 2;
+            char *key_addr = get_key(mid);
+            if(ix_compare(target, key_addr, file_hdr->col_types_, file_hdr->col_lens_) < 0) {
+                right = mid;
+            }else {
+                left = mid + 1;
+            }
+        }
+        return left;
+    }else {
+        // 顺序查找
+        int key_index = 1;
+        for(; key_index < page_hdr->num_key; key_index ++) {
+            char *key_addr = get_key(key_index);
+            if(ix_compare(target, key_addr, file_hdr->col_types_, file_hdr->col_lens_) < 0) {
+                break;
+            }
+        }
+        return key_index;
+    }
 }
 
 /**
