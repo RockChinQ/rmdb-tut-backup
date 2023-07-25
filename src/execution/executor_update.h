@@ -50,7 +50,7 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
 
         for (auto &rid : rids_) {
             auto record = fh_->get_record(rid, context_);
-
+            auto new_record = std::make_unique<RmRecord>(*record);
             if (!check_conds(conds_, *record)) {
                 continue;
             }
@@ -69,14 +69,14 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
             }
 
             // 设置每个字段
-            // for (auto &set_clause : set_clauses_) {
-            //     auto col = set_clause.lhs;
-            //     auto val = set_clause.rhs;
+            for (auto &set_clause : set_clauses_) {
+                auto col = set_clause.lhs;
+                auto val = set_clause.rhs;
 
-            //     auto col_meta = sm_manager_->db_.get_table(set_clause.lhs.tab_name).get_col(col.col_name)[0];
+                auto col_meta = sm_manager_->db_.get_table(set_clause.lhs.tab_name).get_col(col.col_name)[0];
 
-            //     int offset = col_meta.offset;
-            //     int len = col_meta.len;
+                int offset = col_meta.offset;
+                int len = col_meta.len;
 
             //     // int rlen = 0;
             //     // if (val.type == TYPE_INT) {
@@ -93,25 +93,25 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
             //     //     throw InvalidTypeError();
             //     // }
 
-            //     Value *new_val = insert_compatible(col_meta.type, val);
+                Value *new_val = insert_compatible(col_meta.type, val);
 
-            //     new_val->init_raw(col_meta.len);
+                new_val->init_raw(col_meta.len);
 
-            //     record->set_column_value(offset, len, new_val->raw->data);
-            // }
-
-            // fh_->update_record(rid, record.get()->data, context_);
-
-            // 更新record file
-            char new_record[fh_->get_file_hdr().record_size];
-            memcpy(new_record, record->data, fh_->get_file_hdr().record_size);
-            for(auto &set_clause: set_clauses_) {
-                auto lhs_col = tab_.get_col(set_clause.lhs.col_name);
-                // 在内存中修改
-                memcpy(new_record + lhs_col->offset, set_clause.rhs.raw->data, lhs_col->len);
+                new_record->set_column_value(offset, len, new_val->raw->data);
             }
-                        // 对磁盘修改
-            fh_->update_record(rid, new_record, context_);
+
+            fh_->update_record(rid, new_record.get()->data, context_);
+
+            // // 更新record file
+            // char new_record[fh_->get_file_hdr().record_size];
+            // memcpy(new_record, record->data, fh_->get_file_hdr().record_size);
+            // for(auto &set_clause: set_clauses_) {
+            //     auto lhs_col = tab_.get_col(set_clause.lhs.col_name);
+            //     // 在内存中修改
+            //     memcpy(new_record + lhs_col->offset, set_clause.rhs.raw->data, lhs_col->len);
+            // }
+            //             // 对磁盘修改
+            // fh_->update_record(rid, new_record, context_);
 
             try {
                 // 将rid插入在内存中更新后的新的record的cols对应key的index
@@ -121,7 +121,7 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
                     char key[index.col_tot_len];
                     int offset = 0;
                     for(size_t i = 0; i < index.col_num; ++i) {
-                        memcpy(key + offset, new_record + index.cols[i].offset, index.cols[i].len);
+                        memcpy(key + offset, new_record->data + index.cols[i].offset, index.cols[i].len);
                         offset += index.cols[i].len;
                     }
                     ih->insert_entry(key,rid,context_->txn_);

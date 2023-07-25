@@ -540,12 +540,16 @@ bool IxIndexHandle::delete_entry(const char *key, Transaction *transaction) {
 
         buffer_pool_manager_->unpin_page(leaf_node->get_page_id(), false);
 
+        delete leaf_node;
+
         return false;
     } else {
         // 3. 如果删除成功需要调用CoalesceOrRedistribute来进行合并或重分配操作，并根据函数返回结果判断是否有结点需要删除
         bool dele = coalesce_or_redistribute(leaf_node, transaction, &root_is_latched);
 
         buffer_pool_manager_->unpin_page(leaf_node->get_page_id(), true);
+
+        delete leaf_node;
 
         return true;
     }
