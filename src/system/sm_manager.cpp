@@ -244,6 +244,7 @@ void SmManager::drop_table(const std::string& tab_name, Context* context) {
     
     for (auto it = db_.tabs_[tab_name].indexes.begin(); it != db_.tabs_[tab_name].indexes.end(); it++) {
         ix_manager_->destroy_index(tab_name, it->cols);
+        //drop_index(tab_name, it->cols, context);
     }
 
     // 删除表

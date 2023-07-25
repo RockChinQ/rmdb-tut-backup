@@ -55,39 +55,98 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
                 continue;
             }
 
-            // 设置每个字段
-            for (auto &set_clause : set_clauses_) {
-                auto col = set_clause.lhs;
-                auto val = set_clause.rhs;
-
-                auto col_meta = sm_manager_->db_.get_table(set_clause.lhs.tab_name).get_col(col.col_name)[0];
-
-                int offset = col_meta.offset;
-                int len = col_meta.len;
-
-                // int rlen = 0;
-                // if (val.type == TYPE_INT) {
-                //     rlen = sizeof(int);
-                // } else if (val.type == TYPE_FLOAT) {
-                //     rlen = sizeof(float);
-                // } else if (val.type == TYPE_STRING) {
-                //     rlen = val.str_val.size();
-                // } else if (val.type == TYPE_DATETIME) {
-                //     rlen = sizeof(uint64_t);
-                // } else if (val.type == TYPE_BIGINT) {
-                //     rlen = sizeof(int64_t);
-                // } else {
-                //     throw InvalidTypeError();
-                // }
-
-                Value *new_val = insert_compatible(col_meta.type, val);
-
-                new_val->init_raw(col_meta.len);
-
-                record->set_column_value(offset, len, new_val->raw->data);
+            // 删除所有的index
+            for(size_t i = 0; i < tab_.indexes.size(); ++i) {
+                auto& index = tab_.indexes[i];
+                auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(tab_name_, index.cols)).get();
+                char key[index.col_tot_len];
+                int offset = 0;
+                for(size_t i = 0; i < index.col_num; ++i) {
+                    memcpy(key + offset, record->data + index.cols[i].offset, index.cols[i].len);
+                    offset += index.cols[i].len;
+                }
+                ih->delete_entry(key, context_->txn_);
             }
 
-            fh_->update_record(rid, record.get()->data, context_);
+            // 设置每个字段
+            // for (auto &set_clause : set_clauses_) {
+            //     auto col = set_clause.lhs;
+            //     auto val = set_clause.rhs;
+
+            //     auto col_meta = sm_manager_->db_.get_table(set_clause.lhs.tab_name).get_col(col.col_name)[0];
+
+            //     int offset = col_meta.offset;
+            //     int len = col_meta.len;
+
+            //     // int rlen = 0;
+            //     // if (val.type == TYPE_INT) {
+            //     //     rlen = sizeof(int);
+            //     // } else if (val.type == TYPE_FLOAT) {
+            //     //     rlen = sizeof(float);
+            //     // } else if (val.type == TYPE_STRING) {
+            //     //     rlen = val.str_val.size();
+            //     // } else if (val.type == TYPE_DATETIME) {
+            //     //     rlen = sizeof(uint64_t);
+            //     // } else if (val.type == TYPE_BIGINT) {
+            //     //     rlen = sizeof(int64_t);
+            //     // } else {
+            //     //     throw InvalidTypeError();
+            //     // }
+
+            //     Value *new_val = insert_compatible(col_meta.type, val);
+
+            //     new_val->init_raw(col_meta.len);
+
+            //     record->set_column_value(offset, len, new_val->raw->data);
+            // }
+
+            // fh_->update_record(rid, record.get()->data, context_);
+
+            // 更新record file
+            char new_record[fh_->get_file_hdr().record_size];
+            memcpy(new_record, record->data, fh_->get_file_hdr().record_size);
+            for(auto &set_clause: set_clauses_) {
+                auto lhs_col = tab_.get_col(set_clause.lhs.col_name);
+                // 在内存中修改
+                memcpy(new_record + lhs_col->offset, set_clause.rhs.raw->data, lhs_col->len);
+            }
+                        // 对磁盘修改
+            fh_->update_record(rid, new_record, context_);
+
+            try {
+                // 将rid插入在内存中更新后的新的record的cols对应key的index
+                for(size_t i = 0; i < tab_.indexes.size(); ++i) {
+                    auto& index = tab_.indexes[i];
+                    auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(tab_name_, index.cols)).get();
+                    char key[index.col_tot_len];
+                    int offset = 0;
+                    for(size_t i = 0; i < index.col_num; ++i) {
+                        memcpy(key + offset, new_record + index.cols[i].offset, index.cols[i].len);
+                        offset += index.cols[i].len;
+                    }
+                    ih->insert_entry(key,rid,context_->txn_);
+                }
+            }catch(InternalError &error) {
+                // 1. 恢复record
+                fh_->update_record(rid, record->data, context_);
+                // 恢复索引
+                // 2. 恢复所有的index
+                for(size_t i = 0; i < tab_.indexes.size(); ++i) {
+                    auto& index = tab_.indexes[i];
+                    auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(tab_name_, index.cols)).get();
+                    char key[index.col_tot_len];
+                    int offset = 0;
+                    for(size_t i = 0; i < index.col_num; ++i) {
+                        memcpy(key + offset, record->data + index.cols[i].offset, index.cols[i].len);
+                        offset += index.cols[i].len;
+                    }
+                    ih->insert_entry(key, rid, context_->txn_);
+                }
+
+                // 3. 继续抛出异常
+                throw InternalError("Non-unique index!");
+            }
+
         }
 
         return nullptr;
