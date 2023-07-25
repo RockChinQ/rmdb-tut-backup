@@ -54,6 +54,10 @@ class InsertExecutor : public AbstractExecutor, ConditionDependedExecutor {
         }
         // Insert into record file
         rid_ = fh_->insert_record(rec.data, context_);
+
+        TableWriteRecord *write_rcd = new TableWriteRecord(WType::INSERT_TUPLE,tab_name_,rid_);
+        context_->txn_->append_table_write_record(write_rcd);
+
         
         // Insert into index
         // for(size_t i = 0; i < tab_.indexes.size(); ++i) {
@@ -81,6 +85,10 @@ class InsertExecutor : public AbstractExecutor, ConditionDependedExecutor {
                     offset += index.cols[i].len;
                 }
                 ih->insert_entry(key, rid_, context_->txn_);
+
+                IndexWriteRecord *index_rcd = new IndexWriteRecord(WType::INSERT_TUPLE,tab_name_,rid_,key,index.col_tot_len);
+                context_->txn_->append_index_write_record(index_rcd);
+
             }
         }catch(InternalError &error) {
             fh_->delete_record(rid_, context_);

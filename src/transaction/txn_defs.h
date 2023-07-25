@@ -36,19 +36,19 @@ enum class WType { INSERT_TUPLE = 0, DELETE_TUPLE, UPDATE_TUPLE};
  * | wtype | tab_name | tuple_rid | tuple_value |
  * ----------------------------------------------
  */
-class WriteRecord {
+class TableWriteRecord {
    public:
-    WriteRecord() = default;
+     TableWriteRecord() = default;
 
     // constructor for insert operation
-    WriteRecord(WType wtype, const std::string &tab_name, const Rid &rid)
+    TableWriteRecord(WType wtype, const std::string &tab_name, const Rid &rid)
         : wtype_(wtype), tab_name_(tab_name), rid_(rid) {}
 
     // constructor for delete & update operation
-    WriteRecord(WType wtype, const std::string &tab_name, const Rid &rid, const RmRecord &record)
+    TableWriteRecord(WType wtype, const std::string &tab_name, const Rid &rid, const RmRecord &record)
         : wtype_(wtype), tab_name_(tab_name), rid_(rid), record_(record) {}
 
-    ~WriteRecord() = default;
+    ~TableWriteRecord() = default;
 
     inline RmRecord &GetRecord() { return record_; }
 
@@ -63,6 +63,40 @@ class WriteRecord {
     std::string tab_name_;
     Rid rid_;
     RmRecord record_;
+};
+
+class IndexWriteRecord{
+    public:
+     IndexWriteRecord() = default;
+
+     IndexWriteRecord(WType wtype, const std::string &tab_name, const Rid &rid, const char* key, int size)
+        : wtype_(wtype), tab_name_(tab_name), rid_(rid) {
+            key_ = new char[size];
+            memcpy(key_, key, size);
+        }
+     ~IndexWriteRecord() {
+        delete key_;
+     }
+
+    //  ~IndexWriteRecord() = default;
+
+     inline RmRecord &GetRecord() { return record_; }
+
+     inline char* &GetKey() {return key_; }
+
+     inline Rid &GetRid() { return rid_; }
+
+     inline WType &GetWriteType() { return wtype_; }
+
+     inline std::string &GetTableName() { return tab_name_; }
+
+
+    private:
+     WType wtype_;
+     std::string tab_name_;
+     Rid rid_;
+     char *key_;
+     RmRecord record_;
 };
 
 /* 多粒度锁，加锁对象的类型，包括记录和表 */

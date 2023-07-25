@@ -66,6 +66,10 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
                     offset += index.cols[i].len;
                 }
                 ih->delete_entry(key, context_->txn_);
+
+                IndexWriteRecord *index_rcd = new IndexWriteRecord(WType::DELETE_TUPLE,tab_name_,rid,key,index.col_tot_len);
+                context_->txn_->append_index_write_record(index_rcd);
+
             }
 
             // 设置每个字段
@@ -102,6 +106,9 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
 
             fh_->update_record(rid, new_record.get()->data, context_);
 
+            TableWriteRecord *write_rcd = new TableWriteRecord(WType::UPDATE_TUPLE,tab_name_,rid,*record);
+            context_->txn_->append_table_write_record(write_rcd);
+
             // // 更新record file
             // char new_record[fh_->get_file_hdr().record_size];
             // memcpy(new_record, record->data, fh_->get_file_hdr().record_size);
@@ -125,6 +132,10 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
                         offset += index.cols[i].len;
                     }
                     ih->insert_entry(key,rid,context_->txn_);
+                    
+                    IndexWriteRecord *index_rcd = new IndexWriteRecord(WType::INSERT_TUPLE,tab_name_,rid,key,index.col_tot_len);
+                    context_->txn_->append_index_write_record(index_rcd);
+
                 }
             }catch(InternalError &error) {
                 // 1. 恢复record
