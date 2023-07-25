@@ -225,6 +225,8 @@ class IxIndexHandle {
 
     Iid leaf_begin() const;
 
+    int get_fd() {return fd_; }
+
    private:
     // 辅助函数
     void update_root_page_no(page_id_t root) { file_hdr_->root_page_ = root; }

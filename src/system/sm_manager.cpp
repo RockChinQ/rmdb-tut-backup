@@ -243,21 +243,28 @@ void SmManager::drop_table(const std::string& tab_name, Context* context) {
     // 删除索引
     
     for (auto it = db_.tabs_[tab_name].indexes.begin(); it != db_.tabs_[tab_name].indexes.end(); it++) {
+        // buffer_pool_manager_->delete_all_pages(ih->fd_);
+        // ix_manager_->destroy_index(tab_name, it->cols);
+        // //drop_index(tab_name, it->cols, context);
+        // ix_manager_->destroy_index(ihs_.at(index_name).get(), tab_name, col_names);
+
+        auto index_name = ix_manager_->get_index_name(tab_name, it->cols);
+        ix_manager_->close_index(ihs_.at(index_name).get());
+        //ix_manager_->destroy_index(ihs_.at(index_name).get(), tab_name, col_names);
+        buffer_pool_manager_->delete_all_pages(ihs_.at(index_name).get()->get_fd());
         ix_manager_->destroy_index(tab_name, it->cols);
     }
 
-    // 删除表
-    fhs_.erase(tab_name);
-
-    // 删除元数据
-
+    // 2. 删除db_中的对应的tabs_
     db_.tabs_.erase(tab_name);
 
+    // 3. 删除buffer pool中的pages
+    auto rm_file_hdl = fhs_.at(tab_name).get();
+    buffer_pool_manager_->delete_all_pages(rm_file_hdl->GetFd());
 
-    // 删除数据文件
+    // 4. 记录管理器删除表中的数据文件
     rm_manager_->destroy_file(tab_name);
-
-    // 刷新元数据
+    fhs_.erase(tab_name);
 
     flush_meta();
 }
@@ -300,7 +307,10 @@ void SmManager::create_index(const std::string& tab_name, const std::vector<std:
 
     for (auto &col_name : col_names) {
 
-        ColMeta col = tab.get_col(col_name)[0];
+        ColMeta &col = tab.get_col(col_name)[0];
+        //ColMeta &col = *db_.get_table(tab_name).get_col(col_name);
+
+        col.index = true;
 
         ix_meta.col_tot_len += col.len;
         ix_meta.cols.push_back(col);
@@ -314,6 +324,45 @@ void SmManager::create_index(const std::string& tab_name, const std::vector<std:
 
     // 添加到TabMeta中
     tab.indexes.push_back(ix_meta);
+
+    std::string index_name = ix_manager_->get_index_name(tab_name,col_names);
+      // 4. 更新TableMeta
+    int fd = disk_manager_->open_file(index_name);
+
+    auto page = buffer_pool_manager_->fetch_page(PageId{fd,IX_FILE_HDR_PAGE});
+
+    IxFileHdr ix_file_hdl;
+    ix_file_hdl.deserialize(page->get_data());
+    // ix_meta.col_tot_len = ix_file_hdl.col_tot_len_;
+    // ix_meta.col_num = ix_file_hdl.col_num_;
+    // for(auto &col_meta : cols) {
+    //     ix_meta.cols.push_back(col_meta);
+    // }
+    //db_.get_table(tab_name).indexes.push_back(ix_meta);
+
+    char* key = new char[ix_meta.col_tot_len];
+
+    buffer_pool_manager_->unpin_page(page->get_page_id(),false);
+    disk_manager_->close_file(fd);
+
+    // 更新sm_manager
+    // auto ix_hdl = ix_manager_->open_index(tab_name,col_names);
+    ihs_.emplace(index_name, ix_manager_->open_index(tab_name,col_names));
+    auto ix_hdl = ihs_.at(index_name).get();
+    
+    // 将表已存在的record创建索引
+    // auto tab = db_.get_table(tab_name);
+    auto file_hdl = fhs_.at(tab_name).get();
+    for (RmScan rm_scan(file_hdl); !rm_scan.is_end(); rm_scan.next()) {
+        auto rec = file_hdl->get_record(rm_scan.rid(), context);  
+        int offset = 0;
+        for(size_t i = 0; i < ix_meta.col_num; ++i) {
+                memcpy(key + offset, rec->data + ix_meta.cols[i].offset, ix_meta.cols[i].len);
+                offset += ix_meta.cols[i].len;
+            }
+        ix_hdl->insert_entry(key, rm_scan.rid(), context->txn_);
+    }
+
     flush_meta();
 
     std::cout<<"create index success"<<std::endl;
@@ -336,27 +385,45 @@ void SmManager::drop_index(const std::string& tab_name, const std::vector<std::s
         throw IndexNotFoundError(tab_name, col_names);
     }
 
-    // 删除索引文件
-    ix_manager_->destroy_index(tab_name, col_names);
-
-    // 删除TabMeta中的索引
-    for (auto it = db_.get_table(tab_name).indexes.begin(); it != db_.get_table(tab_name).indexes.end(); it++) {
-        if (it->tab_name == tab_name && it->col_num == col_names.size()) {
-            bool flag = true;
-            for (int i = 0; i < col_names.size(); i++) {
-                if (it->cols[i].name != col_names[i]) {
-                    flag = false;
-                    break;
-                }
-            }
-            if (flag) {
-                db_.get_table(tab_name).indexes.erase(it);
-                break;
-            }
+        // 判断索引是否正确
+    TabMeta &tab = db_.tabs_[tab_name];
+    for(auto col_name : col_names) {
+        auto col = tab.get_col(col_name);
+        if(tab.is_col_to_index(col->name)){
+            col->index = false;
         }
     }
 
-    ihs_.erase(ix_manager_->get_index_name(tab_name, col_names));
+    // // 删除索引文件
+    // ix_manager_->destroy_index(tab_name, col_names);
+
+    // // 删除TabMeta中的索引
+    // for (auto it = db_.get_table(tab_name).indexes.begin(); it != db_.get_table(tab_name).indexes.end(); it++) {
+    //     if (it->tab_name == tab_name && it->col_num == col_names.size()) {
+    //         bool flag = true;
+    //         for (int i = 0; i < col_names.size(); i++) {
+    //             if (it->cols[i].name != col_names[i]) {
+    //                 flag = false;
+    //                 break;
+    //             }
+    //         }
+    //         if (flag) {
+    //             db_.get_table(tab_name).indexes.erase(it);
+    //             break;
+    //         }
+    //     }
+    // }
+
+    // ihs_.erase(ix_manager_->get_index_name(tab_name, col_names));
+
+    // 删除索引
+    auto index_name = ix_manager_->get_index_name(tab_name, col_names);
+    ix_manager_->close_index(ihs_.at(index_name).get());
+    ix_manager_->destroy_index(ihs_.at(index_name).get(), tab_name, col_names);
+    
+    auto ix_meta = db_.get_table(tab_name).get_index_meta(col_names);
+    db_.get_table(tab_name).indexes.erase(ix_meta);
+    ihs_.erase(index_name);
 
     flush_meta();
 
