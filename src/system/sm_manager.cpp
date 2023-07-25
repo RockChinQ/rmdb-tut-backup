@@ -243,22 +243,28 @@ void SmManager::drop_table(const std::string& tab_name, Context* context) {
     // 删除索引
     
     for (auto it = db_.tabs_[tab_name].indexes.begin(); it != db_.tabs_[tab_name].indexes.end(); it++) {
+        // buffer_pool_manager_->delete_all_pages(ih->fd_);
+        // ix_manager_->destroy_index(tab_name, it->cols);
+        // //drop_index(tab_name, it->cols, context);
+        // ix_manager_->destroy_index(ihs_.at(index_name).get(), tab_name, col_names);
+
+        auto index_name = ix_manager_->get_index_name(tab_name, it->cols);
+        ix_manager_->close_index(ihs_.at(index_name).get());
+        //ix_manager_->destroy_index(ihs_.at(index_name).get(), tab_name, col_names);
+        buffer_pool_manager_->delete_all_pages(ihs_.at(index_name).get()->get_fd());
         ix_manager_->destroy_index(tab_name, it->cols);
-        //drop_index(tab_name, it->cols, context);
     }
 
-    // 删除表
-    fhs_.erase(tab_name);
-
-    // 删除元数据
-
+    // 2. 删除db_中的对应的tabs_
     db_.tabs_.erase(tab_name);
 
+    // 3. 删除buffer pool中的pages
+    auto rm_file_hdl = fhs_.at(tab_name).get();
+    buffer_pool_manager_->delete_all_pages(rm_file_hdl->GetFd());
 
-    // 删除数据文件
+    // 4. 记录管理器删除表中的数据文件
     rm_manager_->destroy_file(tab_name);
-
-    // 刷新元数据
+    fhs_.erase(tab_name);
 
     flush_meta();
 }
