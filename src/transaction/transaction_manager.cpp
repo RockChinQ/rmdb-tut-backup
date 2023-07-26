@@ -27,8 +27,6 @@ Transaction * TransactionManager::begin(Transaction* txn, LogManager* log_manage
     // 3. 把开始事务加入到全局事务表中
     // 4. 返回当前事务指针
 
-        // 保护txn_map
-    // std::scoped_lock lock(latch_);
     // 1. 判断传入事务参数是否为空指针
     if(txn == nullptr){
         // 2. 如果为空指针，创建新事务
@@ -38,13 +36,6 @@ Transaction * TransactionManager::begin(Transaction* txn, LogManager* log_manage
     // 3. 把开始事务加入到全局事务表中
     txn_map[txn->get_transaction_id()] = txn;
     
-    // BeginLogRecord *begin_log_rcd = new BeginLogRecord(txn->get_transaction_id());
-    // begin_log_rcd->prev_lsn_ = txn->get_prev_lsn();
-    // // 这里我让begin log也立即刷入磁盘了
-    // txn->set_prev_lsn(log_manager->flush_log_to_disk(begin_log_rcd));
-    
-    // 不要忘记delete
-    // delete begin_log_rcd;
 
     // 4. 返回当前事务指针
     return txn;
@@ -113,14 +104,12 @@ void TransactionManager::abort(Transaction * txn, LogManager *log_manager) {
     auto index_write_set = txn->get_index_write_set();
     while(!index_write_set->empty()){
         auto index_write_rcd = index_write_set->back();
-        std::string table_name = index_write_rcd->GetTableName();
-        auto tabs = sm_manager_->db_.get_table(table_name);
-        auto indexes = sm_manager_->db_.get_table(table_name).indexes;
+        auto indexes = sm_manager_->db_.get_table(index_write_rcd->GetTableName()).indexes;
         switch(index_write_rcd->GetWriteType()){
             case WType::INSERT_TUPLE:{
                 for(size_t i = 0; i < indexes.size(); ++i) {
                     auto& index = indexes[i];
-                    auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(table_name, index.cols)).get();
+                    auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(index_write_rcd->GetTableName(), index.cols)).get();
                     ih->delete_entry(index_write_rcd->GetKey(),txn);
                     
                 }
@@ -129,7 +118,7 @@ void TransactionManager::abort(Transaction * txn, LogManager *log_manager) {
             case WType::DELETE_TUPLE:{
                 for(size_t i = 0; i < indexes.size(); ++i) {
                     auto& index = indexes[i];
-                    auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(table_name, index.cols)).get();
+                    auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(index_write_rcd->GetTableName(), index.cols)).get();
                     
                     ih->insert_entry(index_write_rcd->GetKey(),index_write_rcd->GetRid(),txn);
                     
