@@ -201,6 +201,8 @@ class IxIndexHandle {
    public:
     IxIndexHandle(DiskManager *disk_manager, BufferPoolManager *buffer_pool_manager, int fd);
 
+    ~IxIndexHandle();
+
     // for search
     bool get_value(const char *key, std::vector<Rid> *result, Transaction *transaction);
 
