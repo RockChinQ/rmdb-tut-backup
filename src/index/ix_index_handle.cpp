@@ -315,7 +315,6 @@ IxIndexHandle::~IxIndexHandle() {
 std::pair<IxNodeHandle *, bool> IxIndexHandle::find_leaf_page(const char *key, Operation operation,
                                                             Transaction *transaction, bool find_first) {
     // Todo:
-    std::scoped_lock<std::mutex> lock(root_latch_);
     // 1. 获取根节点
 
     auto root_node = fetch_node(file_hdr_->root_page_);
@@ -352,16 +351,14 @@ std::pair<IxNodeHandle *, bool> IxIndexHandle::find_leaf_page(const char *key, O
  */
 bool IxIndexHandle::get_value(const char *key, std::vector<Rid> *result, Transaction *transaction) {
     // Todo:
+
+    std::scoped_lock lock{root_latch_};
+
     // 1. 获取目标key值所在的叶子结点
 
     auto leaf_pair = find_leaf_page(key, Operation::FIND, transaction);
 
     auto leaf_node = leaf_pair.first;
-
-    if (leaf_pair.second){
-        // 释放锁
-        root_latch_.unlock();
-    }
 
     if (leaf_node == nullptr) {
         return false;
@@ -548,6 +545,7 @@ void IxIndexHandle::insert_into_parent(IxNodeHandle *old_node, const char *key, 
  */
 page_id_t IxIndexHandle::insert_entry(const char *key, const Rid &value, Transaction *transaction) {
     // Todo:
+    std::scoped_lock lock {root_latch_};
     // 1. 查找key值应该插入到哪个叶子节点
 
     auto leaf_pair = find_leaf_page(key, Operation::INSERT, transaction);
@@ -555,19 +553,11 @@ page_id_t IxIndexHandle::insert_entry(const char *key, const Rid &value, Transac
     auto leaf_node = leaf_pair.first;
 
     if (!leaf_pair.first) {
-        if (leaf_pair.second){
-            // 释放锁
-            root_latch_.unlock();
-        }
         throw IndexEntryNotFoundError();
     }
 
     // 检查是否唯一
     if (leaf_pair.first->exist_key(key)) {
-        if (leaf_pair.second){
-            // 释放锁
-            root_latch_.unlock();
-        }
         throw InternalError("Non-unique index");
     }
 
@@ -580,11 +570,6 @@ page_id_t IxIndexHandle::insert_entry(const char *key, const Rid &value, Transac
     // 3. 如果结点已满，分裂结点，并把新结点的相关信息插入父节点
 
     if (size_bef == size_after) {
-        
-        if (leaf_pair.second){
-            // 释放锁
-            root_latch_.unlock();
-        }
         buffer_pool_manager_->unpin_page(leaf_node->get_page_id(), false);
         return -1;
     } else if (leaf_pair.first->get_size() >= leaf_pair.first->get_max_size()) {
@@ -600,11 +585,6 @@ page_id_t IxIndexHandle::insert_entry(const char *key, const Rid &value, Transac
         buffer_pool_manager_->unpin_page(leaf_pair.first->get_page_id(), true); //?
 
         delete new_node;
-
-        if (leaf_pair.second){
-            // 释放锁
-            root_latch_.unlock();
-        }
     }
 
     // 提示：记得unpin page；若当前叶子节点是最右叶子节点，则需要更新file_hdr_.last_leaf；记得处理并发的上锁
@@ -623,7 +603,7 @@ page_id_t IxIndexHandle::insert_entry(const char *key, const Rid &value, Transac
  */
 bool IxIndexHandle::delete_entry(const char *key, Transaction *transaction) {
     // Todo:
-    
+    std::scoped_lock lock{root_latch_};
     // 1. 获取该键值对所在的叶子结点
 
     auto leaf_pair = find_leaf_page(key, Operation::DELETE, transaction);
@@ -634,19 +614,11 @@ bool IxIndexHandle::delete_entry(const char *key, Transaction *transaction) {
     // 2. 在该叶子结点中删除键值对
 
     if (!leaf_node) {
-        if (root_is_latched){
-            // 释放锁
-            root_latch_.unlock();
-        }
         return false;
     }
 
     if (leaf_node->get_size() == leaf_node->remove(key)) {
-        if (root_is_latched){
-            // 释放锁
-            root_latch_.unlock();
-        }
-
+        
         buffer_pool_manager_->unpin_page(leaf_node->get_page_id(), false);
 
         delete leaf_node;
