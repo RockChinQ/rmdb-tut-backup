@@ -163,15 +163,15 @@ page_id_t IxNodeHandle::internal_lookup(const char *key) {
     // Todo:
     // 1. 查找当前非叶子节点中目标key所在孩子节点（子树）的位置
 
-    int pos = lower_bound(key);
-    
+    int pos = upper_bound(key);
+    pos -- ;
+
     // 2. 获取该孩子节点（子树）所在页面的编号
-    
-    auto next = rids + pos * sizeof(Rid);
-    
+    page_id_t page_no = value_at(pos);
+
     // 3. 返回页面编号
-    
-    return next->page_no;
+    return page_no;
+
 }
 
 /**
@@ -290,7 +290,7 @@ int IxNodeHandle::remove(const char *key) {
 
     // 2. 如果要删除的键值对存在，删除键值对
     
-    if (pos < page_hdr->num_key && ix_compare(key, keys + pos * file_hdr->col_tot_len_, file_hdr->col_types_, file_hdr->col_lens_) == 0) {
+    if (pos != page_hdr->num_key && ix_compare(key, keys + pos * file_hdr->col_tot_len_, file_hdr->col_types_, file_hdr->col_lens_) == 0) {
         erase_pair(pos);
     }
 
