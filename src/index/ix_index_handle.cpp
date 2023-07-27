@@ -511,7 +511,7 @@ void IxIndexHandle::insert_into_parent(IxNodeHandle *old_node, const char *key, 
         old_node->set_parent_page_no(new_root_page_no);
         new_node->set_parent_page_no(new_root_page_no);
 
-        buffer_pool_manager_->unpin_page(new_root->get_page_id(), true); //?
+       // buffer_pool_manager_->unpin_page(new_root->get_page_id(), true); //?
 
         delete new_root;
 
@@ -533,8 +533,8 @@ void IxIndexHandle::insert_into_parent(IxNodeHandle *old_node, const char *key, 
 
     }
 
-    buffer_pool_manager_->unpin_page(old_node->get_page_id(), true);
-    buffer_pool_manager_->unpin_page(new_node->get_page_id(), true);
+    // buffer_pool_manager_->unpin_page(old_node->get_page_id(), true);
+    // buffer_pool_manager_->unpin_page(new_node->get_page_id(), true);
 }
 
 /**
@@ -589,7 +589,7 @@ page_id_t IxIndexHandle::insert_entry(const char *key, const Rid &value, Transac
 
     // 提示：记得unpin page；若当前叶子节点是最右叶子节点，则需要更新file_hdr_.last_leaf；记得处理并发的上锁
 
-    buffer_pool_manager_->unpin_page(leaf_node->get_page_id(), true); //?
+    buffer_pool_manager_->unpin_page(leaf_node->get_page_id(), false); //?
 
     auto page_id = leaf_node->get_page_no();
     delete leaf_node;
@@ -618,7 +618,7 @@ bool IxIndexHandle::delete_entry(const char *key, Transaction *transaction) {
     }
 
     if (leaf_node->get_size() == leaf_node->remove(key)) {
-        
+
         buffer_pool_manager_->unpin_page(leaf_node->get_page_id(), false);
 
         delete leaf_node;
@@ -683,7 +683,6 @@ bool IxIndexHandle::coalesce_or_redistribute(IxNodeHandle *node, Transaction *tr
         redistribute(neighbor_node, node, parent, index);
         buffer_pool_manager_->unpin_page(parent->get_page_id(), true);
         buffer_pool_manager_->unpin_page(neighbor_node->get_page_id(), true);
-        buffer_pool_manager_->unpin_page(parent->get_page_id(), true);
 
         delete parent;
         delete neighbor_node;
@@ -701,7 +700,6 @@ bool IxIndexHandle::coalesce_or_redistribute(IxNodeHandle *node, Transaction *tr
         coalesce(&neighbor_node, &node, &parent, index, transaction, root_is_latched);
         buffer_pool_manager_->unpin_page(parent->get_page_id(), true);
         buffer_pool_manager_->unpin_page(neighbor_node->get_page_id(), true);
-        buffer_pool_manager_->unpin_page(node->get_page_id(), true);
 
         delete parent;
         delete neighbor_node;
@@ -726,7 +724,7 @@ bool IxIndexHandle::adjust_root(IxNodeHandle *old_root_node) {
 
     
         buffer_pool_manager_->unpin_page(new_root_node->get_page_id(), true);
-        buffer_pool_manager_->unpin_page(old_root_node->get_page_id(), true);
+        
         release_node_handle(*old_root_node);
 
         delete new_root_node;
