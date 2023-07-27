@@ -85,19 +85,72 @@ struct TabMeta {
     }
 
     /* 判断当前表上是否建有指定索引，索引包含的字段为col_names */
-    bool is_index(const std::vector<std::string>& col_names) const {
-        for(auto& index: indexes) {
-            if(index.col_num == col_names.size()) {
-                size_t i = 0;
-                for(; i < index.col_num; ++i) {
-                    if(index.cols[i].name.compare(col_names[i]) != 0)
-                        break;
-                }
-                if(i == index.col_num) return true;
-            }
+    // bool is_index(const std::vector<std::string>& col_names) const {
+    //     for(auto& index: indexes) {
+    //         if(index.col_num == col_names.size()) {
+    //             size_t i = 0;
+    //             for(; i < index.col_num; ++i) {
+    //                 if(index.cols[i].name.compare(col_names[i]) != 0)
+    //                     break;
+    //             }
+    //             if(i == index.col_num) return true;
+    //         }
+    //     }
+
+    //     return false;
+    // }
+    // 原来的实现方式：必须是col和index必须完全匹配，并且不会自动调换cols的顺序
+    std::pair<bool, IndexMeta> is_index(const std::vector<std::string>& col_names) const {
+        // 先统计cols
+        std::map<std::string, bool> col2bool;
+        for(auto col_name : col_names) {
+            col2bool[col_name] = true;
         }
 
-        return false;
+        // 目前：支持最左匹配，且会自动调换顺序
+
+        // 找最匹配的index_meta
+        int min_not_match_cols = INT32_MAX;
+        IndexMeta const *most_match_index = nullptr;
+
+        for(auto &index : indexes) {
+            // 检查是否符合index需求
+            // 1. 统计有多少连续的列用到了index
+            size_t i = 0;
+            int not_match_cols = 0;
+            while(i < index.col_num) {
+                if(col2bool[index.cols[i].name]) {
+                    i++;
+                }else{
+                    break;
+                }
+            }
+            // 2. 如果没有发现，那么该索引不匹配
+            if(i == 0) {
+                continue;
+            }
+            // 3. 检查之后的所有列是否都没有在索引中
+            while(i < index.col_num) {
+                if(!col2bool[index.cols[i].name]) {
+                    i++;
+                    not_match_cols++;
+                }else {
+                    break;
+                }
+            }
+            // 4. 如果i == col_num那么说明之后的所有列都没有用到该索引，否则则说明用到了，该索引不符合最左匹配
+            if(i == index.col_num && not_match_cols < min_not_match_cols) {
+                most_match_index = &index;
+                min_not_match_cols = not_match_cols;
+            }else {
+                continue;
+            }
+        }
+        if(most_match_index != nullptr) {
+            return {true, *most_match_index};
+        }else {
+            return {false, IndexMeta()};
+        }
     }
 
     /* 根据字段名称集合获取索引元数据 */

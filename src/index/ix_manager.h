@@ -30,8 +30,8 @@ class IxManager {
         std::string index_name = filename;
         for(size_t i = 0; i < index_cols.size(); ++i) 
             index_name += "_" + index_cols[i];
-        index_name += "." + filename + ".idx";
-
+        // index_name += "." + filename + ".idx";
+        index_name += ".idx";
         return index_name;
     }
 
@@ -39,8 +39,8 @@ class IxManager {
         std::string index_name = filename;
         for(size_t i = 0; i < index_cols.size(); ++i) 
             index_name += "_" + index_cols[i].name;
-        index_name += "." + filename + ".idx";
-
+        //index_name += "." + filename + ".idx";
+        index_name += ".idx";
         return index_name;
     }
 

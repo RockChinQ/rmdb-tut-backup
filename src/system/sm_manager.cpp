@@ -353,15 +353,22 @@ void SmManager::create_index(const std::string& tab_name, const std::vector<std:
     // 将表已存在的record创建索引
     // auto tab = db_.get_table(tab_name);
     auto file_hdl = fhs_.at(tab_name).get();
-    for (RmScan rm_scan(file_hdl); !rm_scan.is_end(); rm_scan.next()) {
-        auto rec = file_hdl->get_record(rm_scan.rid(), context);  
-        int offset = 0;
-        for(size_t i = 0; i < ix_meta.col_num; ++i) {
-                memcpy(key + offset, rec->data + ix_meta.cols[i].offset, ix_meta.cols[i].len);
-                offset += ix_meta.cols[i].len;
-            }
-        ix_hdl->insert_entry(key, rm_scan.rid(), context->txn_);
-    }
+
+    try{
+        for (RmScan rm_scan(file_hdl); !rm_scan.is_end(); rm_scan.next()) {
+            auto rec = file_hdl->get_record(rm_scan.rid(), context);  
+            int offset = 0;
+            for(size_t i = 0; i < ix_meta.col_num; ++i) {
+                    memcpy(key + offset, rec->data + ix_meta.cols[i].offset, ix_meta.cols[i].len);
+                    offset += ix_meta.cols[i].len;
+                }
+            ix_hdl->insert_entry(key, rm_scan.rid(), context->txn_);
+        }
+    }catch(InternalError &error) {
+            drop_index(tab_name, col_names, context);
+            //throw InternalError("Non-unique index!");
+            std::cout<<"create index fail"<<std::endl;
+        }
 
     flush_meta();
 

@@ -38,8 +38,7 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
     // SmManager *sm_manager_;
 
    public:
-    IndexScanExecutor(SmManager *sm_manager, std::string tab_name, std::vector<Condition> conds, std::vector<std::string> index_col_names,
-                    Context *context) {
+    IndexScanExecutor(SmManager *sm_manager, std::string tab_name, std::vector<Condition> conds, std::vector<std::string> index_col_names, IndexMeta index_meta, Context *context) {
 
         std::cout<<"IndexScanExecutor begin"<<std::endl;
 
@@ -50,18 +49,19 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
         conds_ = std::move(conds);
         // index_no_ = index_no;
         index_col_names_ = index_col_names; 
-        index_meta_ = *(tab_.get_index_meta(index_col_names_));
-
+        //index_meta_ = *(tab_.get_index_meta(index_col_names_));
+        index_meta_ = index_meta;
         std::cout<<"IndexScanExecutor index_meta_:"<<std::endl;
 
         fh_ = sm_manager_->fhs_.at(tab_name_).get();
 
         std::cout<<"IndexScanExecutor fh_:"<<std::endl;
 
-        std::cout<<"index name:"<<sm_manager_->get_ix_manager()->get_index_name(tab_name_, index_col_names_)<<std::endl;
+        std::cout<<"index name1:"<<sm_manager_->get_ix_manager()->get_index_name(tab_name_, index_col_names_)<<std::endl;
+        std::cout<<"index name2:"<<sm_manager_->get_ix_manager()->get_index_name(tab_name_, index_meta_.cols)<<std::endl;
 
         ixh_ = sm_manager_->ihs_.at(
-            sm_manager_->get_ix_manager()->get_index_name(tab_name_, index_col_names_)
+            sm_manager_->get_ix_manager()->get_index_name(tab_name_, index_meta_.cols)
         ).get();
 
         std::cout<<"1"<<std::endl;
@@ -124,6 +124,17 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
                     minv.set_string(std::string(col.len, 0));
                     break;
                 }
+
+                case TYPE_DATETIME : {
+                    maxv.set_datetime(std::string("9999-12-31 23:59:59")); 
+                    minv.set_datetime(std::string("1000-01-01 00:00:00")); 
+                    break;
+                }
+
+                case TYPE_BIGINT : {
+                    throw RMDBError("在index_scan中还没实现type bigint");
+                }
+
                 // TODO: BIGINT 和 DATETIME
                 default:{
                     throw InvalidTypeError();
@@ -131,7 +142,6 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
             }
 
             // 判断cond
-
             for (auto cond : conds_){
                 if (cond.lhs_col.col_name == col.name && cond.is_rhs_val){
                     std::cout<<"IndexScanExecutor cond.lhs_col.col_name:"<<cond.lhs_col.col_name<<std::endl;
@@ -173,6 +183,8 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
 
             maxv.init_raw(col.len);
             minv.init_raw(col.len);
+
+            assert(check_cond(minv, maxv, OP_LE));
 
             memcpy(upper_rec.data + off, maxv.raw->data, col.len);
             memcpy(lower_rec.data + off, minv.raw->data, col.len);
@@ -220,6 +232,7 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
 
     void nextTuple() override {
         std::cout<<"IndexScanExecutor nextTuple"<<std::endl;
+        assert(!is_end());
         scan_->next();
 
         while(!scan_->is_end()){
@@ -248,6 +261,7 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
 
     std::unique_ptr<RmRecord> Next() override {
         std::cout<<"IndexScanExecutor Next"<<std::endl;
+        assert(!is_end());
         return fh_->get_record(rid_, context_);
     }
 

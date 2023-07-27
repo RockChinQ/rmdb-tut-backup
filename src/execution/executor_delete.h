@@ -63,10 +63,18 @@ class DeleteExecutor : public AbstractExecutor, public ConditionDependedExecutor
                     offset += index.cols[i].len;
                 }
                 ih->delete_entry(key, context_->txn_);
+
+                IndexWriteRecord *index_rcd = new IndexWriteRecord(WType::DELETE_TUPLE,tab_name_,rid,key,index.col_tot_len);
+                context_->txn_->append_index_write_record(index_rcd);
+
             }
 
             // 删除记录
             fh_->delete_record(rid, context_);
+
+            TableWriteRecord *write_record = new TableWriteRecord(WType::DELETE_TUPLE,tab_name_,rid,delete_rcd);
+            context_->txn_->append_table_write_record(write_record);
+
         }
 
         return nullptr;

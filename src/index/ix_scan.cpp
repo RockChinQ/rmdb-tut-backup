@@ -26,6 +26,7 @@ void IxScan::next() {
         iid_.slot_no = 0;
         iid_.page_no = node->get_next_leaf();
     }
+    delete node;
 }
 
 Rid IxScan::rid() const {
