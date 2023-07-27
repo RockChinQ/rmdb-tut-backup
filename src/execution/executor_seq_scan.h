@@ -110,7 +110,7 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
         //     std::cout<<"executor_seq_scan Next is_end"<<std::endl;
         //     return nullptr;
         // }
-
+        std::cout<<"getting next from seq scan"<<std::endl;
         auto rec = rid();
 
         auto record = fh_->get_record(rec, context_);

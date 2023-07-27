@@ -41,6 +41,9 @@ class Optimizer {
         } else if (auto x = std::dynamic_pointer_cast<ast::DescTable>(query->parse)) {
             // desc table;
             return std::make_shared<OtherPlan>(T_DescTable, x->tab_name);
+        } else if (auto x = std::dynamic_pointer_cast<ast::ShowIndex>(query->parse)) {
+            // show index;
+            return std::make_shared<OtherPlan>(T_ShowIndex, x->tab_name);
         } else if (auto x = std::dynamic_pointer_cast<ast::TxnBegin>(query->parse)) {
             // begin;
             return std::make_shared<OtherPlan>(T_Transaction_begin, std::string());

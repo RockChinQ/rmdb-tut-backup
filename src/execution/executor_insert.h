@@ -54,19 +54,47 @@ class InsertExecutor : public AbstractExecutor, ConditionDependedExecutor {
         }
         // Insert into record file
         rid_ = fh_->insert_record(rec.data, context_);
+
+        TableWriteRecord *write_rcd = new TableWriteRecord(WType::INSERT_TUPLE,tab_name_,rid_);
+        context_->txn_->append_table_write_record(write_rcd);
+
         
         // Insert into index
-        for(size_t i = 0; i < tab_.indexes.size(); ++i) {
-            auto& index = tab_.indexes[i];
-            auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(tab_name_, index.cols)).get();
-            char* key = new char[index.col_tot_len];
-            int offset = 0;
-            for(size_t i = 0; i < index.col_num; ++i) {
-                memcpy(key + offset, rec.data + index.cols[i].offset, index.cols[i].len);
-                offset += index.cols[i].len;
+        // for(size_t i = 0; i < tab_.indexes.size(); ++i) {
+        //     auto& index = tab_.indexes[i];
+        //     // auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(tab_name_, index.cols)).get();
+        //     char* key = new char[index.col_tot_len];
+        //     int offset = 0;
+        //     for(size_t i = 0; i < index.col_num; ++i) {
+        //         memcpy(key + offset, rec.data + index.cols[i].offset, index.cols[i].len);
+        //         offset += index.cols[i].len;
+        //     }
+        //     // ih->insert_entry(key, rid_, context_->txn_);
+        // }
+
+         // 没有事务恢复部分，我们先用异常处理record和索引的一致性问题
+        try {
+            // Insert into index
+            for(size_t i = 0; i < tab_.indexes.size(); ++i) {
+                auto& index = tab_.indexes[i];
+                auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(tab_name_, index.cols)).get();
+                char key[index.col_tot_len];
+                int offset = 0;
+                for(size_t i = 0; i < index.col_num; ++i) {
+                    memcpy(key + offset, rec.data + index.cols[i].offset, index.cols[i].len);
+                    offset += index.cols[i].len;
+                }
+                ih->insert_entry(key, rid_, context_->txn_);
+
+                IndexWriteRecord *index_rcd = new IndexWriteRecord(WType::INSERT_TUPLE,tab_name_,rid_,key,index.col_tot_len);
+                context_->txn_->append_index_write_record(index_rcd);
+
             }
-            ih->insert_entry(key, rid_, context_->txn_);
+        }catch(InternalError &error) {
+            fh_->delete_record(rid_, context_);
+            throw InternalError("Non-unique index!");
         }
+
         return nullptr;
     }
 

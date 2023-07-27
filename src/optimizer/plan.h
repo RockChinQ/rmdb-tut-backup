@@ -27,6 +27,7 @@ typedef enum PlanTag{
     T_CreateTable,
     T_DropTable,
     T_CreateIndex,
+    T_ShowIndex,
     T_DropIndex,
     T_Insert,
     T_Update,
@@ -75,6 +76,9 @@ class ScanPlan : public Plan
         size_t len_;                               
         std::vector<Condition> fed_conds_;
         std::vector<std::string> index_col_names_;
+
+        // 增加的变量Index_meta
+        IndexMeta index_meta_;
     
 };
 

@@ -30,8 +30,8 @@ class IxManager {
         std::string index_name = filename;
         for(size_t i = 0; i < index_cols.size(); ++i) 
             index_name += "_" + index_cols[i];
+        // index_name += "." + filename + ".idx";
         index_name += ".idx";
-
         return index_name;
     }
 
@@ -39,8 +39,8 @@ class IxManager {
         std::string index_name = filename;
         for(size_t i = 0; i < index_cols.size(); ++i) 
             index_name += "_" + index_cols[i].name;
+        //index_name += "." + filename + ".idx";
         index_name += ".idx";
-
         return index_name;
     }
 
@@ -93,6 +93,9 @@ class IxManager {
 
         disk_manager_->write_page(fd, IX_FILE_HDR_PAGE, data, fhdr->tot_len_);
 
+        // 释放fhdr的内存
+        delete fhdr;
+        
         char page_buf[PAGE_SIZE];  // 在内存中初始化page_buf中的内容，然后将其写入磁盘
         memset(page_buf, 0, PAGE_SIZE);
         // 注意leaf header页号为1，也标记为叶子结点，其前一个/后一个叶子均指向root node
@@ -140,6 +143,13 @@ class IxManager {
 
     void destroy_index(const std::string &filename, const std::vector<std::string>& index_cols) {
         std::string ix_name = get_index_name(filename, index_cols);
+        disk_manager_->destroy_file(ix_name);
+    }
+
+    void destroy_index(const IxIndexHandle *ih, const std::string &filename, const std::vector<std::string>& index_cols) {
+        std::string ix_name = get_index_name(filename, index_cols);
+        // 删除bufferpool中的相关页
+        buffer_pool_manager_->delete_all_pages(ih->fd_);
         disk_manager_->destroy_file(ix_name);
     }
 

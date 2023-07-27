@@ -24,13 +24,19 @@ class IxScan : public RecScan {
     Iid end_;  // 初始为upper
     BufferPoolManager *bpm_;
 
+    Iid lower;
+
    public:
     IxScan(const IxIndexHandle *ih, const Iid &lower, const Iid &upper, BufferPoolManager *bpm)
-        : ih_(ih), iid_(lower), end_(upper), bpm_(bpm) {}
+        : ih_(ih), iid_(lower), end_(upper), bpm_(bpm) {
+        this->lower = lower;
+        }
 
     void next() override;
 
     bool is_end() const override { return iid_ == end_; }
+
+    void begin() override { iid_ = lower; }
 
     Rid rid() const override;
 

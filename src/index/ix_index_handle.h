@@ -11,6 +11,7 @@ See the Mulan PSL v2 for more details. */
 #pragma once
 
 #include "ix_defs.h"
+#include "common/common.h"
 #include "transaction/transaction.h"
 
 enum class Operation { FIND = 0, INSERT, DELETE };  // 三种操作：查找、插入、删除
@@ -31,6 +32,23 @@ inline int ix_compare(const char *a, const char *b, ColType type, int col_len) {
         }
         case TYPE_STRING:
             return memcmp(a, b, col_len);
+        // case TYPE_BIGINT:
+        //     int64_t ia = *(int64_t *)a;
+        //     int64_t ib = *(int64_t *)b;
+        //     return (ia < ib) ? -1 : ((ia > ib) ? 1 : 0);
+        // case TYPE_DATETIME:
+        //     u_int64_t ia = *(u_int64_t *)a;
+        //     u_int64_t ib = *(u_int64_t *)b;
+        //     return (ia < ib) ? -1 : ((ia > ib) ? 1 : 0);
+        case TYPE_DATETIME:{
+            // type datetime以uint64位形式保存
+            uint64_t date_a = *(uint64_t *)a;
+            uint64_t date_b = *(uint64_t *)b;
+            return (date_a < date_b) ? -1 : ((date_a > date_b) ? 1 : 0);
+        }
+        case TYPE_BIGINT : {
+            throw RMDBError("In ix_index_handle, we don't implement bigint type");
+        }
         default:
             throw InternalError("Unexpected data type");
     }
@@ -155,6 +173,17 @@ class IxNodeHandle {
         assert(rid_idx < page_hdr->num_key);
         return rid_idx;
     }
+
+    bool exist_key(const char *key) const {
+        int key_num = page_hdr->num_key;
+        for(int i = 0;i<key_num;i++){
+            char *key_addr = get_key(i);
+            if(ix_compare(key, key_addr, file_hdr->col_types_, file_hdr->col_lens_) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 /* B+树 */
@@ -171,6 +200,8 @@ class IxIndexHandle {
 
    public:
     IxIndexHandle(DiskManager *disk_manager, BufferPoolManager *buffer_pool_manager, int fd);
+
+    ~IxIndexHandle();
 
     // for search
     bool get_value(const char *key, std::vector<Rid> *result, Transaction *transaction);
@@ -204,6 +235,8 @@ class IxIndexHandle {
     Iid leaf_end() const;
 
     Iid leaf_begin() const;
+
+    int get_fd() {return fd_; }
 
    private:
     // 辅助函数

@@ -110,91 +110,9 @@ class ConditionDependedExecutor {
         return true;
     }
 
-    bool check_cond(Value left, Value right, Condition cond){
+    bool check_cond(Value left, Value right, CompOp op){
 
-        // 把双方的int都转成float
-        // if (left.type == TYPE_INT && right.type == TYPE_FLOAT) {
-        //     left.set_float(left.int_val);
-        // } else if (left.type == TYPE_FLOAT && right.type == TYPE_INT) {
-        //     right.set_float(right.int_val);
-        // }
-        // // 把int转换为bigint
-        // if (left.type == TYPE_INT && right.type == TYPE_BIGINT) {
-        //     left.set_bigint(left.int_val);
-        // } else if (left.type == TYPE_BIGINT && right.type == TYPE_INT) {
-        //     right.set_bigint(right.int_val);
-        // }
-        
         double cp_res = 0;
-
-        // // 数字比较
-        // if ( (left.type == TYPE_INT || left.type == TYPE_BIGINT || left.type == TYPE_FLOAT) && 
-        //     (right.type == TYPE_INT || left.type == TYPE_BIGINT || right.type == TYPE_FLOAT ) ){
-        //     int left_flag = 0; // 负数 -1 正数 1 零 0
-        //     int right_flag = 0;
-
-        //     if (left.type == TYPE_INT){
-        //         if (left.int_val<0){
-        //             left_flag = 1;
-        //         } else if (left.int_val>0){
-        //             left_flag = 2;
-        //         } else {
-        //             left_flag = 0;
-        //         }
-        //     } else if (left.type == TYPE_BIGINT){
-        //         if (left.bigint_val<0){
-        //             left_flag = 1;
-        //         } else if (left.bigint_val>0){
-        //             left_flag = 2;
-        //         } else {
-        //             left_flag = 0;
-        //         }
-        //     } else if (left.type == TYPE_FLOAT){
-        //         if (left.float_val<0){
-        //             left_flag = 1;
-        //         } else if (left.float_val>0){
-        //             left_flag = 2;
-        //         } else {
-        //             left_flag = 0;
-        //         }
-        //     }
-
-        //     if (right.type == TYPE_INT){
-        //         if (right.int_val<0){
-        //             right_flag = 1;
-        //         } else if (right.int_val>0){
-        //             right_flag = 2;
-        //         } else {
-        //             right_flag = 0;
-        //         }
-        //     } else if (right.type == TYPE_BIGINT){
-        //         if (right.bigint_val<0){
-        //             right_flag = 1;
-        //         } else if (right.bigint_val>0){
-        //             right_flag = 2;
-        //         } else {
-        //             right_flag = 0;
-        //         }
-        //     } else if (right.type == TYPE_FLOAT){
-        //         if (right.float_val<0){
-        //             right_flag = 1;
-        //         } else if (right.float_val>0){
-        //             right_flag = 2;
-        //         } else {
-        //             right_flag = 0;
-        //         }
-        //     }
-
-        //     // 根据符号进行预判断
-        //     if (left_flag == 0){
-        //         cp_res = right_flag;
-        //     } else {
-        //         if (left_flag == right_flag){
-
-        //         }
-        //     }
-        // }
-
         if (left.type == TYPE_INT && right.type == TYPE_INT) {
             std::cout<<"left.int_val: "<<left.int_val<<" right.int_val: "<<right.int_val<<std::endl;
             if (left.int_val > right.int_val){
@@ -302,7 +220,7 @@ class ConditionDependedExecutor {
 
         std::cout<<"compare result: "<<cp_res<<std::endl;
 
-        switch (cond.op) {
+        switch (op) {
             case OP_EQ:
                 return cp_res == 0;
             case OP_NE:
@@ -318,6 +236,10 @@ class ConditionDependedExecutor {
             default:
                 throw InternalError("Unexpected cond.op field type");
         }
+    }
+
+    bool check_cond(Value left, Value right, Condition cond){
+        return check_cond(left, right, cond.op);
     }
 
     bool check_cond(const Condition &cond, const RmRecord &record) {

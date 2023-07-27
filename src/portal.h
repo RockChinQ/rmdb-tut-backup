@@ -69,8 +69,11 @@ class Portal
             switch(x->tag) {
                 case T_select:
                 {   
+                    std::cout<<"start select"<<std::endl;
                     std::shared_ptr<ProjectionPlan> p = std::dynamic_pointer_cast<ProjectionPlan>(x->subplan_);
+                    std::cout<<"start select convert_plan_executor"<<std::endl;
                     std::unique_ptr<AbstractExecutor> root= convert_plan_executor(p, context);
+                    std::cout<<"start select convert_plan_executor end"<<std::endl;
                     return std::make_shared<PortalStmt>(PORTAL_ONE_SELECT, std::move(p->sel_cols_), std::move(root), plan);
                 }
                     
@@ -178,7 +181,7 @@ class Portal
                 return up;
             }
             else {
-                return std::make_unique<IndexScanExecutor>(sm_manager_, x->tab_name_, x->conds_, x->index_col_names_, context);
+                return std::make_unique<IndexScanExecutor>(sm_manager_, x->tab_name_, x->conds_, x->index_col_names_, x->index_meta_, context);
             } 
         } else if(auto x = std::dynamic_pointer_cast<JoinPlan>(plan)) {
             std::unique_ptr<AbstractExecutor> left = convert_plan_executor(x->left_, context);

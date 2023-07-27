@@ -76,6 +76,13 @@ std::shared_ptr<Query> Analyze::do_analyze(std::shared_ptr<ast::TreeNode> parse)
                 value = tmp;
             }
 
+            //char* 和  DATETIME
+            if(col.type == TYPE_STRING && value.type == TYPE_DATETIME) {
+                Value tmp;
+                tmp.set_str(value.datetime_val.encode_to_string());
+                value = tmp;
+            }
+
             set_clause.rhs = value;
             
             query->set_clauses.push_back(set_clause);
@@ -102,7 +109,12 @@ std::shared_ptr<Query> Analyze::do_analyze(std::shared_ptr<ast::TreeNode> parse)
                 Value tmp;
                 tmp.set_bigint(value.int_val);
                 query->values.push_back(tmp);
-            }else {
+            } else if(cols[i].type == TYPE_STRING && value.type == TYPE_DATETIME) {
+                Value tmp;
+                tmp.set_str(value.datetime_val.encode_to_string());
+                query->values.push_back(tmp);
+            }
+            else {
                 query->values.push_back(value);
             }
         }
@@ -233,9 +245,13 @@ void Analyze::check_clause(const std::vector<std::string> &tab_names, std::vecto
             //添加int和bigint转换
             if(lhs_col->type == TYPE_INT && cond.rhs_val.type == TYPE_BIGINT) {
                 throw TypeOverflowError("INT", std::to_string(cond.rhs_val.bigint_val));
-            }else if(lhs_col->type == TYPE_BIGINT && cond.rhs_val.type == TYPE_INT) {
+            } else if(lhs_col->type == TYPE_BIGINT && cond.rhs_val.type == TYPE_INT) {
                 Value tmp;
                 tmp.set_bigint(cond.rhs_val.int_val);
+                cond.rhs_val = tmp;
+            } else if(lhs_col->type == TYPE_STRING && cond.rhs_val.type == TYPE_DATETIME) {
+                Value tmp;
+                tmp.set_str(cond.rhs_val.datetime_val.encode_to_string());
                 cond.rhs_val = tmp;
             }
             // cond.rhs_val.init_raw(lhs_col->len);

@@ -108,6 +108,12 @@ struct CreateIndex : public TreeNode {
             tab_name(std::move(tab_name_)), col_names(std::move(col_names_)) {}
 };
 
+struct ShowIndex : public TreeNode {
+    std::string tab_name;
+
+    ShowIndex(std::string tab_name_) : tab_name(std::move(tab_name_)) {}
+};
+
 struct DropIndex : public TreeNode {
     std::string tab_name;
     std::vector<std::string> col_names;
