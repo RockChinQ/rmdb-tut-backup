@@ -412,43 +412,6 @@ bool IxIndexHandle::get_value(const char *key, std::vector<Rid> *result, Transac
  */
 IxNodeHandle *IxIndexHandle::split(IxNodeHandle *node) {
     // // Todo:
-    // // 1. 将原结点的键值对平均分配，右半部分分裂为新的右兄弟结点
-    // //    需要初始化新节点的page_hdr内容
-
-    // auto new_node = create_node();
-
-    // int mid = node->get_size() / 2;
-
-    // new_node->set_size(node->get_size() - mid);
-    // //new_node->set_size(0);
-    // new_node->page_hdr->is_leaf = node->page_hdr->is_leaf;
-    // new_node->set_parent_page_no(node->get_parent_page_no());
-    // // new_node->page_hdr->next_free_page_no = node->page_hdr->next_free_page_no;
-
-    // for (int i = mid; i < node->get_size(); ++i) {
-    //     new_node->set_key(i-mid, node->get_key(i));
-    //     new_node->set_rid(i-mid, *(node->get_rid(i)));
-    // }
-    // node->set_size(mid);
-
-    // // 2. 如果新的右兄弟结点是叶子结点，更新新旧节点的prev_leaf和next_leaf指针
-    // //    为新节点分配键值对，更新旧节点的键值对数记录
-
-    // if (new_node->is_leaf_page()) {
-    //     new_node->page_hdr->prev_leaf = node->get_page_no();
-    //     new_node->page_hdr->next_leaf = node->page_hdr->next_leaf;
-    //     node->page_hdr->next_leaf = new_node->get_page_no();
-    // } 
-    
-    // // 3. 如果新的右兄弟结点不是叶子结点，更新该结点的所有孩子结点的父节点信息(使用IxIndexHandle::maintain_child())
-    
-    // else {
-    //     for (int i = 0; i < new_node->get_size(); ++i) {
-    //         maintain_child(new_node, i);
-    //     }
-    // }
-
-    // return new_node;
     // 1. 将原结点的键值对平均分配，右半部分分裂为新的右兄弟结点
     IxNodeHandle *new_node = create_node();
     //    需要初始化新节点的page_hdr内容
