@@ -27,20 +27,18 @@ Transaction * TransactionManager::begin(Transaction* txn, LogManager* log_manage
     // 3. 把开始事务加入到全局事务表中
     // 4. 返回当前事务指针
 
-    // 1. 判断传入事务参数是否为空指针
+    std::scoped_lock lock(latch_);
+
     if(txn == nullptr){
-        // 2. 如果为空指针，创建新事务
         txn = new Transaction(next_txn_id_);
         next_txn_id_++;
+        txn->set_start_ts(next_timestamp_++);
+	    txn->set_state(TransactionState::DEFAULT);
     }
-    // 3. 把开始事务加入到全局事务表中
     txn_map[txn->get_transaction_id()] = txn;
     
-
-    // 4. 返回当前事务指针
     return txn;
     
-    //return nullptr;
 }
 
 /**
@@ -56,8 +54,20 @@ void TransactionManager::commit(Transaction* txn, LogManager* log_manager) {
     // 4. 把事务日志刷入磁盘中
     // 5. 更新事务状态
 
+    std::scoped_lock lock(latch_);
+
     txn->set_state(TransactionState::COMMITTED);
 
+    for(auto const &locked : *(txn->get_lock_set())) {
+        lock_manager_->unlock(txn, locked);
+    }
+
+    // 释放写集
+    txn->get_table_write_set()->clear();
+    txn->get_index_write_set()->clear();
+
+    //释放锁集
+    txn->get_lock_set()->clear();
 }
 
 /**
@@ -72,68 +82,61 @@ void TransactionManager::abort(Transaction * txn, LogManager *log_manager) {
     // 3. 清空事务相关资源，eg.锁集
     // 4. 把事务日志刷入磁盘中
     // 5. 更新事务状态
-    
-    // 1. 回滚该事务所有的写操作
-    auto table_write_set = txn->get_table_write_set();
-    Context context(lock_manager_,log_manager,txn);
-    while(!table_write_set->empty()){
-        auto write_rcd = table_write_set->back();
-        auto &rm_file_hdl = sm_manager_->fhs_.at(write_rcd->GetTableName());
-        switch(write_rcd->GetWriteType()){
-            case WType::INSERT_TUPLE:{
-                rm_file_hdl->delete_record(write_rcd->GetRid(),&context);
-                break;
-            }
-            case WType::DELETE_TUPLE:{
-                rm_file_hdl->insert_record(write_rcd->GetRecord().data,&context);
-                break;
-            }
-            case WType::UPDATE_TUPLE:{
-                rm_file_hdl->update_record(write_rcd->GetRid(),write_rcd->GetRecord().data,&context);
-                break;
-            }
-        }
-        
-        table_write_set->pop_back();
 
-        delete write_rcd;
-    }
+    std::scoped_lock lock(latch_);
 
-    table_write_set->clear();
-
-    auto index_write_set = txn->get_index_write_set();
-    while(!index_write_set->empty()){
-        auto index_write_rcd = index_write_set->back();
-        auto indexes = sm_manager_->db_.get_table(index_write_rcd->GetTableName()).indexes;
-        switch(index_write_rcd->GetWriteType()){
-            case WType::INSERT_TUPLE:{
-                for(size_t i = 0; i < indexes.size(); ++i) {
-                    auto& index = indexes[i];
-                    auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(index_write_rcd->GetTableName(), index.cols)).get();
-                    ih->delete_entry(index_write_rcd->GetKey(),txn);
-                    
-                }
-                break;
-            }
-            case WType::DELETE_TUPLE:{
-                for(size_t i = 0; i < indexes.size(); ++i) {
-                    auto& index = indexes[i];
-                    auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(index_write_rcd->GetTableName(), index.cols)).get();
-                    
-                    ih->insert_entry(index_write_rcd->GetKey(),index_write_rcd->GetRid(),txn);
-                    
-                }
-                break;
-            }
-        }
-        index_write_set->pop_back();
-
-        delete index_write_rcd;
-    }
-
-    index_write_set->clear();
-
-    // 5. 更新事务状态
     txn->set_state(TransactionState::ABORTED);
+
+    Context context(lock_manager_, log_manager, txn);
+
+    auto table_set = txn->get_table_write_set();
+
+    while(!table_set->empty()){
+        auto write_record = table_set->back();
+        auto &rm_file = sm_manager_->fhs_.at(write_record->GetTableName());
+
+        if (write_record->GetWriteType() == WType::INSERT_TUPLE) {
+            rm_file->delete_record(write_record->GetRid(), &context);
+        } else if (write_record->GetWriteType() == WType::DELETE_TUPLE) {
+            rm_file->insert_record(write_record->GetRecord().data, &context);
+        } else if (write_record->GetWriteType() == WType::UPDATE_TUPLE) {
+            rm_file->update_record(write_record->GetRid(), write_record->GetRecord().data, &context);
+        }
+
+        table_set->pop_back();
+
+        delete write_record;
+    }
+
+    table_set->clear();
+
+    auto index_set = txn->get_index_write_set();
+    while(!index_set->empty()){
+        auto index_record = index_set->back();
+        auto indexes = sm_manager_->db_.get_table(index_record->GetTableName()).indexes;
+
+        if (index_record->GetWriteType() == WType::INSERT_TUPLE) {
+            for (auto &index : indexes) {
+                auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(index_record->GetTableName(), index.cols)).get();
+                ih->delete_entry(index_record->GetKey(), txn);
+            }
+        } else if (index_record->GetWriteType() == WType::DELETE_TUPLE) {
+            for (auto &index : indexes) {
+                auto ih = sm_manager_->ihs_.at(sm_manager_->get_ix_manager()->get_index_name(index_record->GetTableName(), index.cols)).get();
+                ih->insert_entry(index_record->GetKey(), index_record->GetRid(), txn);
+            }
+        }
+        index_set->pop_back();
+
+        delete index_record;
+    }
+
+    index_set->clear();
+
+    for(auto const &locked : *(txn->get_lock_set())) {
+        lock_manager_->unlock(txn, locked);
+    }
+
+    txn->get_lock_set()->clear();
 
 }
