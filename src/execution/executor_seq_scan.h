@@ -50,6 +50,10 @@ class SeqScanExecutor : public AbstractExecutor, public ConditionDependedExecuto
 
         RmScan *scan = new RmScan(fh_);
         scan_ = std::unique_ptr<RecScan>(scan);
+
+        if(context != nullptr) {
+            context->lock_mgr_->lock_shared_on_table(context->txn_, fh_->GetFd());
+        }
     }
 
     size_t tupleLen() const override { return len_; }

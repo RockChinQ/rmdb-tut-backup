@@ -48,6 +48,10 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
 
     std::unique_ptr<RmRecord> Next() override {
 
+        if(context_ != nullptr) {
+            context_->lock_mgr_->lock_IX_on_table(context_->txn_, fh_->GetFd());
+        }
+
         for (auto &rid : rids_) {
             auto record = fh_->get_record(rid, context_);
             auto new_record = std::make_unique<RmRecord>(*record);
