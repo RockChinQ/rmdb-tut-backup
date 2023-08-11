@@ -84,6 +84,10 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
         }
         fed_conds_ = conds_;
 
+        if(context_ != nullptr) {
+            context_->lock_mgr_->lock_shared_on_table(context_->txn_, fh_->GetFd());
+        }
+
         std::cout<<"IndexScanExecutor end"<<std::endl;
     }
 
@@ -95,9 +99,9 @@ class IndexScanExecutor : public AbstractExecutor, public ConditionDependedExecu
 
     void beginTuple() override {
 
-        if(context_ != nullptr) {
-            context_->lock_mgr_->lock_shared_on_table(context_->txn_, fh_->GetFd());
-        }
+        // if(context_ != nullptr) {
+        //     context_->lock_mgr_->lock_shared_on_table(context_->txn_, fh_->GetFd());
+        // }
 
         std::cout<<"IndexScanExecutor beginTuple"<<std::endl;
 
