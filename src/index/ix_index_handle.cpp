@@ -863,6 +863,9 @@ Rid IxIndexHandle::get_rid(const Iid &iid) const {
  * 可用*(int *)key转换回去
  */
 Iid IxIndexHandle::lower_bound(const char *key) {
+
+    std::scoped_lock latch{root_latch_};
+
     auto node_pair = find_leaf_page(key, Operation::FIND, nullptr);
 
     if (!node_pair.first) {
@@ -888,6 +891,9 @@ Iid IxIndexHandle::lower_bound(const char *key) {
  * @return Iid
  */
 Iid IxIndexHandle::upper_bound(const char *key) {
+
+    std::scoped_lock latch{root_latch_};
+    
     auto node_pair = find_leaf_page(key, Operation::FIND, nullptr);
 
     if (!node_pair.first) {
