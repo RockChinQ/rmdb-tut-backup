@@ -15,7 +15,7 @@ See the Mulan PSL v2 for more details. */
 #include "index/ix.h"
 #include "system/sm.h"
 
-class InsertExecutor : public AbstractExecutor, ConditionDependedExecutor {
+class InsertExecutor : public AbstractExecutor, public ConditionDependedExecutor {
    private:
     TabMeta tab_;                   // 表的元数据
     std::vector<Value> values_;     // 需要插入的数据

@@ -33,10 +33,10 @@ Transaction * TransactionManager::begin(Transaction* txn, LogManager* log_manage
         txn = new Transaction(next_txn_id_);
         next_txn_id_++;
         txn->set_start_ts(next_timestamp_++);
-	    txn->set_state(TransactionState::DEFAULT);
     }
     txn_map[txn->get_transaction_id()] = txn;
-    
+    txn->set_state(TransactionState::DEFAULT);
+
     return txn;
     
 }
@@ -56,8 +56,6 @@ void TransactionManager::commit(Transaction* txn, LogManager* log_manager) {
 
     std::scoped_lock lock(latch_);
 
-    txn->set_state(TransactionState::COMMITTED);
-
     for(auto const &locked : *(txn->get_lock_set())) {
         lock_manager_->unlock(txn, locked);
     }
@@ -68,6 +66,8 @@ void TransactionManager::commit(Transaction* txn, LogManager* log_manager) {
 
     //释放锁集
     txn->get_lock_set()->clear();
+
+    txn->set_state(TransactionState::COMMITTED);
 }
 
 /**
@@ -84,8 +84,6 @@ void TransactionManager::abort(Transaction * txn, LogManager *log_manager) {
     // 5. 更新事务状态
 
     std::scoped_lock lock(latch_);
-
-    txn->set_state(TransactionState::ABORTED);
 
     Context context(lock_manager_, log_manager, txn);
 
@@ -138,5 +136,7 @@ void TransactionManager::abort(Transaction * txn, LogManager *log_manager) {
     }
 
     txn->get_lock_set()->clear();
+
+    txn->set_state(TransactionState::ABORTED);
 
 }

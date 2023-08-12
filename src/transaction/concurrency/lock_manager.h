@@ -65,8 +65,9 @@ private:
     std::mutex latch_;      // 用于锁表的并发
     std::unordered_map<LockDataId, LockRequestQueue> lock_table_;   // 全局锁表
 
-    // 加锁检查
-    bool lock_check(Transaction *txn);
-    // 释放锁检查
-    bool unlock_check(Transaction *txn);
+    // check加锁检查
+    bool check_lock(Transaction *txn);
+    // check释放锁
+    bool check_unlock(Transaction *txn);
+
 };
