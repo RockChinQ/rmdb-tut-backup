@@ -35,6 +35,10 @@ class DeleteExecutor : public AbstractExecutor, public ConditionDependedExecutor
         conds_ = conds;
         rids_ = rids;
         context_ = context;
+
+        if(context_ != nullptr) {
+            context_->lock_mgr_->lock_IX_on_table(context_->txn_, fh_->GetFd());
+        }
     }
 
     std::string getType() override { return "DeleteExecutor"; }
@@ -43,9 +47,11 @@ class DeleteExecutor : public AbstractExecutor, public ConditionDependedExecutor
 
     std::unique_ptr<RmRecord> Next() override {
         
+        // if(context_ != nullptr) {
+        //     context_->lock_mgr_->lock_IX_on_table(context_->txn_, fh_->GetFd());
+        // }
 
         for (auto &rid : rids_) {
-            // auto record = fh_->get_record(rid, context_);
 
             auto record = fh_->get_record(rid, context_);
 

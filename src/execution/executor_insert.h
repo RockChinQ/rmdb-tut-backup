@@ -15,7 +15,7 @@ See the Mulan PSL v2 for more details. */
 #include "index/ix.h"
 #include "system/sm.h"
 
-class InsertExecutor : public AbstractExecutor, ConditionDependedExecutor {
+class InsertExecutor : public AbstractExecutor, public ConditionDependedExecutor {
    private:
     TabMeta tab_;                   // 表的元数据
     std::vector<Value> values_;     // 需要插入的数据
@@ -35,11 +35,19 @@ class InsertExecutor : public AbstractExecutor, ConditionDependedExecutor {
         }
         fh_ = sm_manager_->fhs_.at(tab_name).get();
         context_ = context;
+
+        if(context_ != nullptr) {
+            context_->lock_mgr_->lock_IX_on_table(context_->txn_, fh_->GetFd());
+        }
     };
 
     std::string getType() override { return "InsertExecutor"; }
 
     std::unique_ptr<RmRecord> Next() override {
+
+        // if(context_ != nullptr) {
+        //     context_->lock_mgr_->lock_IX_on_table(context_->txn_, fh_->GetFd());
+        // }
         // Make record buffer
         RmRecord rec(fh_->get_file_hdr().record_size);
         for (size_t i = 0; i < values_.size(); i++) {

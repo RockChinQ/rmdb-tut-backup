@@ -19,6 +19,10 @@ See the Mulan PSL v2 for more details. */
 std::unique_ptr<RmRecord> RmFileHandle::get_record(const Rid& rid, Context* context) const {
     // Todo:
     
+    if(context != nullptr) {
+        context->lock_mgr_->lock_shared_on_record(context->txn_, rid, fd_);
+    }
+
     // 1. 获取指定记录所在的page handle
 
     RmPageHandle page_handle = fetch_page_handle(rid.page_no);
@@ -66,6 +70,11 @@ Rid RmFileHandle::insert_record(char* buf, Context* context) {
 
     if(slot_no == file_hdr_.num_records_per_page){ 
         throw InvalidSlotNoError(slot_no, file_hdr_.num_records_per_page);
+    }
+
+    if(context != nullptr) {
+        auto rid = Rid{.page_no = spare_page_handle.page->get_page_id().page_no, .slot_no = slot_no};
+        context->lock_mgr_->lock_exclusive_on_record(context->txn_, rid, fd_);
     }
 
     // 3. 将buf复制到空闲slot位置
@@ -126,6 +135,11 @@ void RmFileHandle::insert_record(const Rid& rid, char* buf) {
  */
 void RmFileHandle::delete_record(const Rid& rid, Context* context) {
     // Todo:
+
+    if(context != nullptr) {
+        context->lock_mgr_->lock_exclusive_on_record(context->txn_, rid, fd_);
+    }
+
     // 1. 获取指定记录所在的page handle
 
     // TODO: 异常检查
@@ -159,6 +173,11 @@ void RmFileHandle::delete_record(const Rid& rid, Context* context) {
  */
 void RmFileHandle::update_record(const Rid& rid, char* buf, Context* context) {
     // Todo:
+
+    if(context != nullptr) {
+        context->lock_mgr_->lock_exclusive_on_record(context->txn_, rid, fd_);
+    }
+    
     // 1. 获取指定记录所在的page handle
     
     // TODO: 异常检查

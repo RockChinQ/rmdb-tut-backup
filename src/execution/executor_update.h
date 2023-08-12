@@ -38,6 +38,9 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
         rids_ = rids;
         context_ = context;
 
+        if(context_ != nullptr) {
+            context_->lock_mgr_->lock_IX_on_table(context_->txn_, fh_->GetFd());
+        }
     }
 
     // size_t tupleLen() const override { return tab_.tuple_len; }
@@ -47,6 +50,10 @@ class UpdateExecutor : public AbstractExecutor, public ConditionDependedExecutor
     const std::vector<ColMeta> &cols() const override { return tab_.cols; }
 
     std::unique_ptr<RmRecord> Next() override {
+
+        // if(context_ != nullptr) {
+        //     context_->lock_mgr_->lock_IX_on_table(context_->txn_, fh_->GetFd());
+        // }
 
         for (auto &rid : rids_) {
             auto record = fh_->get_record(rid, context_);
